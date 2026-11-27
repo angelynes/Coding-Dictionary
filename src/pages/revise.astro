@@ -1,0 +1,42 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { getCollection } from 'astro:content';
+import Flashcards from '../components/Flashcards.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const docs = (await getCollection('docs')).sort((a, b) => a.id.localeCompare(b.id));
+
+const all = docs.flatMap((d) =>
+	(d.data.flashcards ?? []).map((c) => ({
+		...c,
+		source: d.data.title,
+		href: `${base}/${d.id}/`,
+		topic: d.id.split('/')[0],
+	})),
+);
+const topics = [...new Set(all.map((c) => c.topic))].filter((t) => t !== 'index' && t !== 'guide');
+const label = (t: string) => ({ python: 'Python', sql: 'SQL' })[t] ?? t[0].toUpperCase() + t.slice(1);
+---
+
+<StarlightPage frontmatter={{ title: 'Revise', description: 'Flashcards from every page of the dictionary.' }}>
+	<p>
+		All <strong>{all.length}</strong> flashcards from every page. Click a card to flip it, then press
+		<strong>✓ Got it</strong> to take it out of the round or <strong>↺ Review again</strong> to send it to the back.
+	</p>
+	<Tabs syncKey="revise-topic">
+		<TabItem label={`All (${all.length})`}>
+			<Flashcards cards={all} />
+		</TabItem>
+		{
+			topics.map((t) => {
+				const cards = all.filter((c) => c.topic === t);
+				return (
+					<TabItem label={`${label(t)} (${cards.length})`}>
+						<Flashcards cards={cards} />
+					</TabItem>
+				);
+			})
+		}
+	</Tabs>
+</StarlightPage>

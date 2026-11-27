@@ -1,0 +1,151 @@
+---
+title: Window functions
+description: OVER, PARTITION BY, running totals, moving averages, ROW_NUMBER, RANK, DENSE_RANK, LAG, LEAD.
+sidebar:
+  order: 8
+flashcards:
+  - q: What does OVER() do?
+    a: Defines the "window" of rows a function looks at, while keeping every row (unlike GROUP BY, which collapses rows).
+  - q: What does an empty `OVER()` mean?
+    a: Compute the function across all rows in the result.
+  - q: What does PARTITION BY do?
+    a: Splits the rows into groups (partitions). The function restarts in each group.
+  - q: Which frame gives a running total?
+    a: "`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`"
+  - q: Which frame gives a 3-row moving average?
+    a: "`ROWS BETWEEN 2 PRECEDING AND CURRENT ROW`"
+  - q: RANK vs DENSE_RANK with a tie for 2nd?
+    a: "RANK: 1, 2, 2, 4 (skips). DENSE_RANK: 1, 2, 2, 3 (no gap)."
+  - q: What do LAG and LEAD do?
+    a: LAG looks back (e.g. yesterday's value). LEAD looks forward (e.g. tomorrow's value).
+  - q: How do you get day-over-day revenue change?
+    a: "`revenue - LAG(revenue, 1) OVER (ORDER BY sale_date)`"
+---
+
+import { Concept, Value, Entry } from '@components';
+
+## The window: OVER & PARTITION BY
+
+<Entry term="function(column) OVER (…)">
+<Fragment slot="code">
+
+```sql
+function(column) OVER (
+  PARTITION BY group_column
+  ORDER BY order_column
+  ROWS BETWEEN start_boundary AND end_boundary
+)
+```
+
+</Fragment>
+
+`OVER(...)` defines the <Concept>window</Concept>: the set of rows the function works on. Unlike `GROUP BY`, **every row stays** in the result.
+
+- `PARTITION BY`: divides the rows into partitions (groups)
+- `ORDER BY`: orders the rows inside each partition
+- `ROWS BETWEEN`: which nearby rows to include (the <Concept>frame</Concept>)
+- `OVER()` left **empty** means: use all rows in the result
+
+</Entry>
+
+<Entry term="SUM() OVER (PARTITION BY … ORDER BY …)">
+<Fragment slot="code">
+
+```sql run
+SELECT sale_date, category_id, revenue,
+  SUM(revenue) OVER (
+    PARTITION BY category_id ORDER BY sale_date
+  ) AS category_running_total,
+  SUM(revenue) OVER () AS grand_total
+FROM sales
+ORDER BY category_id, sale_date;
+```
+
+</Fragment>
+
+A running total that **restarts for each category**, next to a grand total from an empty `OVER()`.
+
+</Entry>
+
+## Running totals & moving averages
+
+<Entry term="ROWS BETWEEN … AND CURRENT ROW">
+<Fragment slot="code">
+
+```sql run
+SELECT date, goals,
+  SUM(goals) OVER (
+    ORDER BY date
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_total,
+  ROUND(AVG(goals) OVER (
+    ORDER BY date
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ), 2) AS moving_avg
+FROM matches;
+```
+
+</Fragment>
+
+- **Running total**: `UNBOUNDED PRECEDING` includes every row from the start up to the current row.
+- **Moving average over 3 rows**: `2 PRECEDING` includes the current row and the 2 before it.
+
+</Entry>
+
+## Numbering & ranking
+
+<Entry term="ROW_NUMBER()">
+<Fragment slot="code">
+
+```sql run
+SELECT name, department, salary,
+  ROW_NUMBER() OVER (
+    PARTITION BY department ORDER BY salary DESC
+  ) AS row_num
+FROM employees;
+```
+
+</Fragment>
+
+Gives a **unique** sequential number to each row within its partition. Filter `row_num = 1` to get the top earner per department.
+
+</Entry>
+
+<Entry term="RANK() · DENSE_RANK()">
+<Fragment slot="code">
+
+```sql run
+SELECT product, units_sold,
+  RANK()       OVER (ORDER BY units_sold DESC) AS standard_rank,
+  DENSE_RANK() OVER (ORDER BY units_sold DESC) AS dense_rank
+FROM sales;
+```
+
+</Fragment>
+
+- `RANK()`: ties share a rank, then numbers are **skipped**. Like a strict podium: a tie for 2nd means no 3rd place. **1, 2, 2, 4**
+- `DENSE_RANK()`: ties share a rank and **no numbers are skipped**. **1, 2, 2, 3**
+
+</Entry>
+
+## Looking back & forward
+
+<Entry term="LAG() · LEAD()">
+<Fragment slot="code">
+
+```sql run
+SELECT sale_date, revenue,
+  LAG(revenue, 1)  OVER (ORDER BY sale_date) AS yesterday_revenue,
+  LEAD(revenue, 1) OVER (ORDER BY sale_date) AS tomorrow_revenue,
+  revenue - LAG(revenue, 1) OVER (ORDER BY sale_date) AS revenue_difference
+FROM sales;
+```
+
+</Fragment>
+
+- `LAG(`<Value>column</Value>`, `<Value>offset</Value>`)` looks **back** a number of rows, e.g. yesterday's revenue.
+- `LEAD(`<Value>column</Value>`, `<Value>offset</Value>`)` looks **forward**, e.g. tomorrow's revenue.
+
+`revenue - LAG(revenue, 1)` shows how much revenue grew or shrank compared to yesterday.
+
+</Entry>

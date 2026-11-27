@@ -1,0 +1,133 @@
+---
+title: Aggregates, grouping & sorting
+description: COUNT, SUM, AVG, MIN, MAX, ROUND, GROUP BY, HAVING, ORDER BY, LIMIT.
+sidebar:
+  order: 6
+flashcards:
+  - q: What's the difference between `COUNT(*)` and `COUNT(column)`?
+    a: "`COUNT(*)` counts all rows. `COUNT(column)` ignores NULLs in that column."
+  - q: Does AVG treat NULL as 0?
+    a: No, it ignores NULLs completely.
+  - q: What does `ROUND(value, -2)` do?
+    a: A negative number rounds to the left of the decimal point (to the hundreds). 1234 → 1200
+  - q: What is the difference between WHERE and HAVING?
+    a: WHERE filters rows before grouping. HAVING filters groups after aggregation.
+  - q: What is ORDER BY's default direction?
+    a: Ascending (ASC), smallest first / A to Z
+  - q: How do you get the top 5 oldest celebs?
+    a: "`ORDER BY age DESC LIMIT 5`"
+  - q: What does `ORDER BY age, income DESC` do?
+    a: Sorts by age ascending, then within the same age by income from most to least.
+---
+
+import { Concept, Entry } from '@components';
+
+## Aggregate functions
+
+<Concept>Aggregate functions</Concept> do a calculation on a set of values and return **one** value.
+
+| Function | Works on | NULL handling |
+| --- | --- | --- |
+| `COUNT(*)` | All rows | Counts rows regardless of NULLs |
+| `COUNT(column)` | One column | Ignores NULLs |
+| `SUM(column)` | Numbers only | Ignores NULLs |
+| `AVG(column)` | Numbers only | Ignores NULLs (doesn't treat NULL as 0) |
+| `MIN(column)` | Numbers, text, dates | Ignores NULLs |
+| `MAX(column)` | Numbers, text, dates | Ignores NULLs |
+
+```sql run
+SELECT COUNT(*)              AS all_rows,
+       COUNT(twitter_handle) AS with_handle,
+       SUM(age)              AS total_age,
+       AVG(age)              AS avg_age,
+       MIN(age), MAX(name)
+FROM celebs;
+```
+
+<Entry term="ROUND(value, n)">
+<Fragment slot="code">
+
+```sql run
+SELECT ROUND(3.14159, 2)  AS two_dp,
+       ROUND(1234.5, 0)   AS whole,
+       ROUND(AVG(age), 1) AS avg_age
+FROM celebs;
+```
+
+</Fragment>
+
+- Positive `n` rounds to the **right** of the decimal point.
+- Negative `n` rounds to the **left**: tens, hundreds, thousands. (Works in PostgreSQL and SQL Server, but not in SQLite.)
+
+</Entry>
+
+## Grouping
+
+<Entry term="GROUP BY">
+<Fragment slot="code">
+
+```sql run
+SELECT age, COUNT(*)
+FROM celebs
+GROUP BY age;
+```
+
+</Fragment>
+
+Groups rows that have the same values into **summary rows**. Usually used with aggregate functions.
+
+</Entry>
+
+<Entry term="HAVING">
+<Fragment slot="code">
+
+```sql run
+SELECT age, COUNT(*)
+FROM celebs
+GROUP BY age
+HAVING COUNT(*) > 1;
+```
+
+</Fragment>
+
+Filters the results **of a GROUP BY**.
+
+`WHERE` filters rows **before** aggregation. `HAVING` filters **after** aggregation.
+
+</Entry>
+
+## Ordering & limiting
+
+<Entry term="ORDER BY … ASC / DESC">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+ORDER BY age DESC;
+
+SELECT name, age, income FROM celebs
+ORDER BY age, income DESC;
+```
+
+</Fragment>
+
+Sorts the results ascending (`ASC`) or descending (`DESC`). The **default is ascending**, alphabetical for text.
+
+`ORDER BY age, income DESC` sorts by age (youngest to oldest), then income (most to least).
+
+</Entry>
+
+<Entry term="LIMIT">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+ORDER BY age DESC
+LIMIT 5;
+```
+
+</Fragment>
+
+Sets the **maximum number of rows** returned. Very useful for "Top N" questions.
+
+</Entry>

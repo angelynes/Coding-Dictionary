@@ -1,0 +1,141 @@
+---
+title: Matplotlib & NumPy
+description: Intermediate Python (DataCamp). Line plots, scatter plots, histograms, customisation, NumPy arrays.
+sidebar:
+  order: 11
+flashcards:
+  - q: What do you import to draw graphs?
+    a: "`import matplotlib.pyplot as plt`"
+  - q: Which functions draw a line plot, scatter plot and histogram?
+    a: "`plt.plot(x, y)`, `plt.scatter(x, y)`, `plt.hist(list)`"
+  - q: What does `plt.show()` do? And `plt.clf()`?
+    a: "`show` displays the plot. `clf` cleans (clears) it so you can start a new one."
+  - q: What are bins in a histogram, and what's the default?
+    a: The number of bars. Default is 10. Change it with `plt.hist(list, bins=5)`.
+  - q: How do you put the x-axis on a log scale?
+    a: "`plt.xscale('log')`"
+  - q: What do `c=`, `s=` and `alpha=` do in `plt.scatter`?
+    a: "`c` colour, `s` size, `alpha` transparency from 0 (invisible) to 1 (solid)."
+  - q: What happens with `np_pop * 2` on a NumPy array?
+    a: Every element is doubled (maths happens per item, unlike a list).
+---
+
+import { Concept, Value, Entry } from '@components';
+
+From the **Intermediate Python** course on DataCamp.
+
+## Matplotlib
+
+Builds graphs such as line plots, scatter plots and histograms. Always start with:
+
+```python
+import matplotlib.pyplot as plt
+```
+
+Use `help(plt.hist)` or `help(plt.plot)` to read the help for any function.
+
+<Entry term="Line plot · plt.plot()">
+<Fragment slot="code">
+
+```python
+plt.plot(x, y)
+plt.show()
+```
+
+</Fragment>
+
+Builds the line plot. `x` is the horizontal axis, `y` the vertical axis. `plt.show()` displays it.
+
+</Entry>
+
+<Entry term="Scatter plot · plt.scatter()">
+<Fragment slot="code">
+
+```python
+plt.scatter(x, y)
+plt.xscale('log')
+plt.show()
+```
+
+</Fragment>
+
+Builds the scatter plot. `plt.xscale('log')` puts the x-axis on a <Concept>logarithmic scale</Concept>.
+
+</Entry>
+
+<Entry term="Histogram · plt.hist()">
+<Fragment slot="code">
+
+```python
+plt.hist(values, bins=5)
+plt.show()
+plt.clf()
+```
+
+</Fragment>
+
+<Concept>Bins</Concept> = the number of bars. By default Python uses 10. `plt.clf()` cleans the plot.
+
+</Entry>
+
+## Customisation
+
+| Code | What it does |
+| --- | --- |
+| `plt.xlabel('year')` | Label the x-axis |
+| `plt.ylabel('age')` | Label the y-axis |
+| `plt.title('progress')` | Title of the graph |
+| `plt.xticks([0, 1, 2], ['one', 'two', 'three'])` | Replace tick values on the x-axis |
+| `plt.yticks(previous, after)` | Replace tick values on the y-axis |
+| `plt.scatter(x, y, c=col)` | `c` = colour |
+| `plt.scatter(x, y, s=size)` | `s` = size of the dots |
+| `plt.scatter(x, y, alpha=0.8)` | Transparency: 0 invisible, 1 solid |
+| `plt.text(1550, 71, 'India')` | Add text into the plot |
+| `plt.grid(True)` | Add a grid |
+
+<Entry term="Colour by category">
+<Fragment slot="code">
+
+```python
+dict = {
+    'Asia': 'red',
+    'Europe': 'green',
+    'Africa': 'blue',
+    'Americas': 'yellow',
+    'Oceania': 'black',
+}
+col = [dict[c] for c in continent]
+plt.scatter(gdp, life, c=col, alpha=0.8)
+```
+
+</Fragment>
+
+The Gapminder data has a list `continent` with the continent each country belongs to. A dictionary maps each continent to a colour.
+
+</Entry>
+
+## NumPy
+
+<Entry term="np.array()">
+<Fragment slot="code">
+
+```python
+import numpy as np
+np_pop = np.array(pop)
+np_pop = np_pop * 2
+plt.scatter(gdp, life, s=np_pop)
+```
+
+</Fragment>
+
+Stores a list as a <Concept>NumPy array</Concept>. Maths works **on every element**: `* 2` doubles each value. Here the array sets the dot sizes.
+
+</Entry>
+
+```python run title="Python + NumPy"
+import numpy as np
+pop = [1.2, 3.5, 0.8]
+print([p * 2 for p in pop])   # list: loop needed
+print(np.array(pop) * 2)      # array: maths on every element
+```
+

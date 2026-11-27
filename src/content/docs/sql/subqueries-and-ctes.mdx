@@ -1,0 +1,146 @@
+---
+title: Subqueries, CTEs & COALESCE
+description: Subqueries, correlated and nested subqueries, CTEs with WITH, and COALESCE for missing data.
+sidebar:
+  order: 9
+flashcards:
+  - q: What is a subquery?
+    a: A query nested inside another query.
+  - q: A subquery used with `>` in WHERE must return what?
+    a: A single value (e.g. an aggregate like AVG), otherwise you get an error.
+  - q: What makes a subquery "correlated"?
+    a: It uses values from the outer query, so it re-runs for each row.
+  - q: What is a CTE?
+    a: A Common Table Expression, `WITH name AS (...)`. It's a temporary named result you can use in the main query.
+  - q: How do you write two CTEs?
+    a: "One WITH, separated by commas: `WITH a AS (...), b AS (...) SELECT ...`"
+  - q: What does COALESCE do?
+    a: Returns the first non-NULL value in its list, e.g. `COALESCE(phone, email, 'No Contact Info')`
+---
+
+import { Concept, Entry } from '@components';
+
+## Subqueries
+
+<Entry term="Subquery">
+<Fragment slot="code">
+
+```sql run
+SELECT *
+FROM celebs
+WHERE age > (SELECT AVG(age) FROM celebs);
+```
+
+</Fragment>
+
+A <Concept>subquery</Concept> is a query **nested inside** another query.
+
+When compared with `>`, `=` etc., it has to return a **single** (aggregate) value to avoid errors.
+
+</Entry>
+
+<Entry term="Correlated subquery">
+<Fragment slot="code">
+
+```sql run
+SELECT c.name,
+  (SELECT ROUND(AVG(goals), 2)
+   FROM matches
+   WHERE matches.country_id = c.id) AS avg_goals
+FROM country AS c;
+```
+
+</Fragment>
+
+Uses values **from the outer query** (`c.id`) to get its result, so it's **re-run for each row**. That can be slow on big tables.
+
+</Entry>
+
+<Entry term="Nested subqueries">
+<Fragment slot="code">
+
+```sql run
+SELECT strftime('%m', date) AS month,
+  SUM(goals) - (
+    SELECT AVG(monthly_goals) FROM (
+      SELECT strftime('%m', date) AS month,
+             SUM(goals) AS monthly_goals
+      FROM matches
+      GROUP BY month
+    ) AS subquery
+  ) AS goal_difference
+FROM matches
+GROUP BY month;
+```
+
+</Fragment>
+
+A subquery **inside** a subquery, for multi-step calculations: monthly totals, then their average, then each month's difference from it.
+
+:::note
+PostgreSQL writes `EXTRACT(MONTH FROM date)`. SQLite (used here) writes `strftime('%m', date)`.
+:::
+
+</Entry>
+
+## CTEs: Common Table Expressions
+
+<Entry term="WITH … AS (…)">
+<Fragment slot="code">
+
+```sql run
+WITH SeniorCelebs AS (
+  SELECT *
+  FROM celebs
+  WHERE age > 65
+)
+SELECT name
+FROM SeniorCelebs;
+```
+
+</Fragment>
+
+A <Concept>CTE</Concept> is a **temporary named result** that you can use inside a `SELECT`, `INSERT`, `UPDATE` or `DELETE`.
+
+It creates the temporary virtual table `SeniorCelebs` first, with the rule for what goes inside it.
+
+</Entry>
+
+<Entry term="Multiple CTEs">
+<Fragment slot="code">
+
+```sql run
+WITH dept_avg AS (
+  SELECT department, AVG(salary) AS avg_salary
+  FROM employees GROUP BY department
+),
+top_depts AS (
+  SELECT * FROM dept_avg WHERE avg_salary > 55000
+)
+SELECT * FROM top_depts;
+```
+
+</Fragment>
+
+SQL allows only **one `WITH`** at the start. Separate further CTEs with a **comma**. A later CTE can use an earlier one.
+
+</Entry>
+
+## Formatting missing data
+
+<Entry term="COALESCE()">
+<Fragment slot="code">
+
+```sql run
+SELECT id,
+  COALESCE(phone_number, email, 'No Contact Info') AS contact
+FROM users;
+```
+
+</Fragment>
+
+Returns the **first non-NULL** value in a list. If there's no phone number it returns the email; if there's no email either, it returns `'No Contact Info'`.
+
+Useful for cleaning missing e-commerce data.
+
+</Entry>

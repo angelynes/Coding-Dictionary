@@ -1,0 +1,59 @@
+---
+title: Arithmetic & null safety
+description: The integer division pitfall, aliasing calculated columns, and handling NULL correctly.
+sidebar:
+  order: 4
+flashcards:
+  - q: What does `SELECT 2 / 10;` return, and why?
+    a: 0. Integer divided by integer gives a truncated integer.
+  - q: How do you fix integer division?
+    a: "Multiply by `1.0` or `100.0` (or write `2.0 / 10`) to force decimal maths."
+  - q: Why use AS on calculated columns?
+    a: Without an alias, the column gets a placeholder name like `?column?` (PostgreSQL).
+  - q: Why doesn't `WHERE column = NULL` work?
+    a: NULL is unknown, so `= NULL` and `!= NULL` never return TRUE. Use `IS NULL` / `IS NOT NULL`.
+---
+
+import { Concept, Entry } from '@components';
+
+## Integer division pitfall
+
+<Entry term="2 / 10 = 0 ?!">
+<Fragment slot="code">
+
+```sql run
+SELECT 2 / 10        AS int_math,
+       2.0 / 10      AS decimal_math,
+       2 * 100.0 / 10 AS percent;
+```
+
+</Fragment>
+
+- **Problem**: integer ÷ integer gives a **truncated integer**, so `2 / 10` is `0`.
+- **Fix**: multiply by `1.0` or `100.0` to force floating-point maths, e.g. `count_dead * 100.0 / count_all` gives an accurate percentage.
+- **Default names**: calculated columns without an alias get placeholder names like `?column?` (PostgreSQL). **Always use `AS`.**
+
+</Entry>
+
+## Missing data (NULL)
+
+<Entry term="IS NULL · IS NOT NULL">
+<Fragment slot="code">
+
+```sql run
+-- returns nothing!
+SELECT name FROM celebs WHERE twitter_handle = NULL;
+
+-- correct
+SELECT name FROM celebs WHERE twitter_handle IS NULL;
+```
+
+</Fragment>
+
+<Concept>NULL</Concept> represents missing or unknown data. It **cannot** be checked with `= NULL` or `!= NULL`; those always return FALSE or NULL.
+
+Check it with:
+1. `WHERE column_name IS NULL`
+2. `WHERE column_name IS NOT NULL`
+
+</Entry>

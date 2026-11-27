@@ -1,0 +1,82 @@
+---
+title: Data types, characters & constraints
+description: INTEGER, DECIMAL, TEXT, DATE, wildcards, NULL, comparison operators, PRIMARY KEY, UNIQUE, NOT NULL, DEFAULT.
+sidebar:
+  order: 2
+flashcards:
+  - q: What is a database schema?
+    a: It shows the data types for each field in all tables and the relationships between tables.
+  - q: In `DECIMAL(p, s)`, what are p and s?
+    a: p = precision (total digits), s = scale (digits after the decimal point). DECIMAL(5,2) fits 999.99
+  - q: How is DATE formatted?
+    a: YYYY-MM-DD
+  - q: What does `*` mean in `SELECT *`?
+    a: A wildcard that selects every column without naming each one.
+  - q: What is NULL?
+    a: A special value representing missing or unknown data.
+  - q: What are two ways to write "not equal" in SQL?
+    a: "`!=` or `<>`"
+  - q: What does PRIMARY KEY guarantee?
+    a: Each record is uniquely identified (it's automatically UNIQUE and NOT NULL). One per table.
+  - q: What's the difference between PRIMARY KEY and UNIQUE?
+    a: A table has exactly one PRIMARY KEY, but can have many UNIQUE columns.
+  - q: What does DEFAULT do?
+    a: Gives a column a value to use when an inserted row doesn't specify one.
+---
+
+import { Value, Concept, Entry } from '@components';
+
+## Data types
+
+<Concept>Database schema</Concept>: shows the data types for each field in all tables, and the relationships between tables.
+
+| Type | Meaning |
+| --- | --- |
+| `INTEGER` / `INT` | Whole number (positive or negative) |
+| `DECIMAL(p, s)` / `REAL` | Exact / floating decimal values. **p**: precision, **s**: scale |
+| `TEXT` / `VARCHAR(n)` | A text string (`n` sets the max character length) |
+| `DATE` | A date formatted as `YYYY-MM-DD` |
+
+## Characters
+
+| Character | Meaning |
+| --- | --- |
+| `*` | Special <Concept>wildcard</Concept>. Selects every column without naming each one |
+| `NULL` | Special value for **missing or unknown** data |
+| `=` | Equal to |
+| `!=` or `<>` | Not equal to |
+| `<=` `>=` | Less than or equal to; greater than or equal to |
+| `<` `>` | Less than; greater than |
+| `!<` `!>` | Not less than; not greater than (SQL Server only) |
+
+## Column constraints
+
+<Concept>Constraints</Concept> add rules about how a column can be used. They go **after the data type**, and the database **rejects** inserted data that breaks them.
+
+<Entry term="PRIMARY KEY · UNIQUE · NOT NULL · DEFAULT">
+<Fragment slot="code">
+
+```sql run
+CREATE TABLE people (
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE,
+  date_of_birth TEXT NOT NULL,
+  date_of_death TEXT DEFAULT 'Not Applicable'
+);
+
+INSERT INTO people (id, name, date_of_birth)
+VALUES (1, 'Ada', '1815-12-10');
+
+SELECT * FROM people;
+```
+
+</Fragment>
+
+- `PRIMARY KEY`: uniquely identifies each record (automatically UNIQUE and NOT NULL). Each table should have exactly one.
+- `UNIQUE`: all values in the column are different across rows. A table can have many UNIQUE columns.
+- `NOT NULL`: the column must have a value.
+- `DEFAULT`: the value to use if a new row doesn't give one.
+
+**Try it:** add a second `INSERT` with the same name and see the error.
+
+</Entry>

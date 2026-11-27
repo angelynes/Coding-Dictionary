@@ -1,0 +1,137 @@
+---
+title: Data types & converting
+description: Lists, dictionaries, tuples, sets and booleans, converting between types, ord/chr, printing with sep and end.
+sidebar:
+  order: 2
+flashcards:
+  - q: Which brackets make a list, a dictionary, a tuple and a set?
+    a: "List `[ ]`, dictionary `{ }` with key: value, tuple `( )`, set `{ }` without definitions"
+  - q: How do you turn a variable into a string, an integer and a float?
+    a: "`str(x)`, `int(x)`, `float(x)`"
+  - q: What do `ord()` and `chr()` do?
+    a: "`ord('a')` turns a character into its number (97). `chr(97)` turns a number back into a character ('a')."
+  - q: In `print()`, what is the difference between joining with `,` and `+`?
+    a: "`,` adds a space and works with numbers and strings. `+` adds no space and only joins strings."
+  - q: What do `sep=` and `end=` do in `print()`?
+    a: "`sep` is what goes between items (default is a space). `end` is what goes at the end (default is a new line)."
+  - q: What base are binary and decimal numbers?
+    a: Binary is base 2 (only 0s and 1s). Decimal is base 10 (digits 0 to 9).
+---
+
+import { Concept, Value, Entry } from '@components';
+
+## Collection types
+
+| Type | Brackets | Example | Notes |
+| --- | --- | --- | --- |
+| <Concept>List</Concept> | `[ ]` | `['maths', 'english']` | Ordered, can change. [More →](../lists/) |
+| <Concept>Dictionary</Concept> | `{ }` | `{'a': 'apple'}` | Key: value pairs, with definitions. [More →](../dictionaries/) |
+| <Concept>Tuple</Concept> | `( )` | `(43, 45, 49)` | Ordered, **cannot** change. [More →](../tuples/) |
+| <Concept>Set</Concept> | `{ }` | `{1, 2, 3}` | No duplicates, no definitions. [More →](../sets/) |
+| <Concept>Boolean</Concept> | none | `True` / `False` | Yes or no |
+
+## Printing words & phrases
+
+<Entry term="Joining with , vs +">
+<Fragment slot="code">
+
+```python
+print('I am', 20, 'years old')   # comma
+print('Hello' + 'World')         # plus
+```
+
+</Fragment>
+
+- `,` includes **one space** and works with numbers and strings.
+- `+` includes **no space** and only joins strings.
+
+</Entry>
+
+<Entry term="sep= and end=">
+<Fragment slot="code">
+
+```python
+print('a', 'b', 'c', sep='-')    # a-b-c
+print('Loading', end='...')
+print('done')                    # Loading...done
+```
+
+</Fragment>
+
+- `sep=` sets what goes **between** items (default `' '`).
+- `end=` sets what goes at the **end** (default is a new line).
+
+</Entry>
+
+## Changing data type
+
+<Entry term="str() · int() · float()">
+<Fragment slot="code">
+
+```python
+str(variable)     # to String
+int(variable)     # to Integer
+float(variable)   # to Float
+```
+
+</Fragment>
+
+Converts a value to another type. Useful because `input()` always gives a **string**.
+
+</Entry>
+
+<Entry term="round()">
+<Fragment slot="code">
+
+```python
+round(3.7)       # 4
+round(3.14159, 2)  # 3.14
+```
+
+</Fragment>
+
+Rounds a float to the **nearest** whole number, or to a number of decimal places.
+
+:::note[Corrected from my notes]
+It's written `round(variable)`, not `variable.round()`. It rounds to the nearest number, not always up.
+:::
+
+</Entry>
+
+```python run
+age = '20'
+print(age + '1')        # joins text: 201
+print(int(age) + 1)     # maths: 21
+print(float(age))       # 20.0
+print(round(2.567, 1))  # 2.6
+```
+
+## Changing data type (Unicode)
+
+<Entry term="ord() · chr()">
+<Fragment slot="code">
+
+```python
+ord('a')   # 97
+chr(97)    # 'a'
+```
+
+</Fragment>
+
+- `ord` (ordinal) changes **letters to numbers**.
+- `chr` (character) changes **numbers to letters**.
+
+</Entry>
+
+## Binary and decimals
+
+| Binary | Decimal |
+| --- | --- |
+| Base 2 | Base 10 |
+| Series of 0s and 1s | Numbers from 0 to 9 |
+
+```python run
+print(bin(10))         # decimal to binary: 0b1010
+print(int('1010', 2))   # binary to decimal: 10
+```
+

@@ -1,0 +1,84 @@
+---
+/**
+ * One dictionary entry: the term, the code on the left and the
+ * explanation on the right (like the tables in the original docs).
+ *
+ * <Entry term="LEFT JOIN">
+ *   <Fragment slot="code"> ```sql ... ``` </Fragment>
+ *   Explanation in Markdown...
+ * </Entry>
+ */
+interface Props {
+	term: string;
+	id?: string;
+}
+const { term, id } = Astro.props;
+const slug =
+	id ??
+	term
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-|-$/g, '');
+const hasCode = Astro.slots.has('code');
+---
+
+<section class:list={['cd-entry', { 'cd-entry--split': hasCode }]}>
+	<h3 id={slug} class="cd-term not-content">{term}</h3>
+	<div class="cd-grid">
+		{hasCode && <div class="cd-code"><slot name="code" /></div>}
+		<div class="cd-explain"><slot /></div>
+	</div>
+</section>
+
+<style>
+	.cd-entry {
+		border: 1px solid var(--cd-card-border);
+		border-radius: 0.6rem;
+		background: var(--cd-card-bg);
+		overflow: hidden;
+		margin-top: 1rem;
+	}
+	.cd-term {
+		margin: 0 !important;
+		padding: 0.45rem 0.9rem;
+		background: var(--cd-term-bg);
+		border-bottom: 1px solid var(--cd-card-border);
+		font-family: var(--__sl-font-mono);
+		font-size: var(--sl-text-base) !important;
+		color: var(--sl-color-accent-high) !important;
+	}
+	.cd-grid {
+		display: grid;
+		gap: 0.9rem;
+		padding: 0.9rem;
+	}
+	.cd-entry--split .cd-grid {
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+	}
+	@media (max-width: 50rem) {
+		.cd-entry--split .cd-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+	}
+	/* Runnable boxes need the full width: explanation first, then the box. */
+	.cd-entry--split .cd-grid:has(run-sql, run-python) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.cd-grid:has(run-sql, run-python) .cd-explain {
+		order: -1;
+	}
+	.cd-code :global(run-sql),
+	.cd-code :global(run-python) {
+		margin-top: 0;
+	}
+	.cd-code > :global(*:first-child),
+	.cd-explain > :global(*:first-child) {
+		margin-top: 0;
+	}
+	.cd-explain {
+		font-size: var(--sl-text-sm);
+	}
+	.cd-explain :global(ul) {
+		padding-inline-start: 1.1rem;
+	}
+</style>

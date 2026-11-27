@@ -1,0 +1,44 @@
+---
+title: Coding Dictionary
+description: My personal dictionary of everything I have studied in Python and SQL.
+template: splash
+hero:
+  tagline: Everything I've studied, in one searchable place. Look it up, run it, revise it.
+  actions:
+    - text: Python
+      link: python/
+      icon: right-arrow
+    - text: SQL
+      link: sql/
+      icon: right-arrow
+      variant: secondary
+    - text: Revise with flashcards
+      link: revise/
+      icon: star
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { Legend } from '@components';
+
+<CardGrid>
+	<Card title="Look it up" icon="magnifier">
+		Press <kbd>/</kbd> or <kbd>⌘</kbd><kbd>K</kbd> anywhere and type a word like `rstrip`, `HAVING` or `tuple`.
+	</Card>
+	<Card title="Run it" icon="rocket">
+		Code boxes marked **▶ Run** are editable. Python and SQL run right in the browser, no setup needed.
+	</Card>
+	<Card title="Revise it" icon="star">
+		Every page ends with flashcards, and the [Revise](revise/) page shuffles all of them together.
+	</Card>
+	<Card title="Colour legend" icon="information">
+		<Legend />
+	</Card>
+</CardGrid>
+
+## Topics
+
+<CardGrid>
+	<LinkCard title="🐍 Python" description="Operators, data types, loops, strings, lists, dictionaries, tuples, sets, files, CSV, functions, Matplotlib." href="python/" />
+	<LinkCard title="🗄️ SQL" description="Execution order, constraints, DDL & DML, filtering, aggregates, joins, window functions, subqueries & CTEs." href="sql/" />
+</CardGrid>

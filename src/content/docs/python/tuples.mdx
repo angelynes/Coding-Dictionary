@@ -1,0 +1,71 @@
+---
+title: Tuples
+description: Immutable ordered collections, converting lists, and how tuples are compared.
+sidebar:
+  order: 7
+flashcards:
+  - q: What is the main difference between a tuple and a list?
+    a: A tuple is immutable (cannot be changed). `append()` doesn't work on tuples.
+  - q: How do you "change" a tuple then?
+    a: Build a new tuple and assign it back to the same variable, e.g. `t = t + (6,)`
+  - q: How are tuples compared?
+    a: Item by item. Compare the first items; if they're equal, compare the second items, and so on.
+  - q: How are strings compared?
+    a: "By the first letter (alphabetical order): 'apple' < 'banana' is True. Uppercase comes before lowercase."
+  - q: How do you convert a list to a tuple?
+    a: "`tuple(variable)`"
+---
+
+import { Concept, Entry } from '@components';
+
+A <Concept>tuple</Concept> is like a list that **cannot be changed**, e.g. `(43, 45, 49, 52, 55)`.
+
+<Entry term="tuple()">
+<Fragment slot="code">
+
+```python
+new = tuple([1, 2, 3])   # (1, 2, 3)
+```
+
+</Fragment>
+
+Converts a list to a tuple.
+
+</Entry>
+
+<Entry term="Comparing tuples">
+<Fragment slot="code">
+
+```python
+a = (1, 2, 3)
+b = (1, 5, 0)
+print(a > b)   # False: 1 == 1, then 2 < 5
+```
+
+</Fragment>
+
+Tuples are compared **per item**. The first items are compared; if they're equal, the second items are compared, and so on.
+
+</Entry>
+
+## Things to remember
+
+- `append()` **cannot** be used on tuples.
+- Tuples are <Concept>immutable</Concept>. You "modify" one by building a new tuple and assigning the result back to the same variable.
+- Strings are compared by their **first letter**: `'hello' < 'world'` because h comes before w. (Uppercase letters come before lowercase.)
+- Comparing only works when the **types** match. `(1, 'a') < ('b', 2)` gives an error.
+
+```python run
+scores = (43, 45, 49)
+scores = scores + (52,)       # new tuple, same name
+print(scores)
+
+print((1, 2, 3) < (1, 5, 0))  # compares 2 vs 5
+print('hello' < 'world')
+
+try:
+    scores.append(60)
+except AttributeError as e:
+    print('Error:', e)
+```
+

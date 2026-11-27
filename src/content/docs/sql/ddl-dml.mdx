@@ -1,0 +1,154 @@
+---
+title: Table schema & data manipulation (DDL & DML)
+description: CREATE TABLE, ALTER TABLE, INSERT INTO, UPDATE, DELETE FROM, CREATE VIEW.
+sidebar:
+  order: 3
+flashcards:
+  - q: Which statement creates a new table?
+    a: "`CREATE TABLE name (column TYPE, ...);`"
+  - q: How do you add a column to an existing table?
+    a: "`ALTER TABLE celebs ADD COLUMN twitter_handle TEXT;`"
+  - q: How do you add a new row?
+    a: "`INSERT INTO celebs (id, name, age) VALUES (1, 'Justin Bieber', 22);`"
+  - q: What happens if you forget WHERE in an UPDATE or DELETE?
+    a: Every single row is updated, or deleted (leaving an empty table).
+  - q: What are the 3 clauses of an UPDATE?
+    a: "UPDATE (which table), SET (which column = new value), WHERE (which rows)"
+  - q: What is a VIEW?
+    a: A saved SELECT statement that works like a virtual table.
+  - q: How should tables and fields be named?
+    a: Clear, lowercase, with underscores. Field names are singular.
+  - q: What do DDL and DML stand for?
+    a: "Data Definition Language (CREATE, ALTER, DROP: the structure) and Data Manipulation Language (INSERT, UPDATE, DELETE: the data)."
+---
+
+import { Value, Concept, Entry } from '@components';
+
+- <Concept>DDL</Concept> (Data Definition Language) changes the **structure**: `CREATE`, `ALTER`, `DROP`.
+- <Concept>DML</Concept> (Data Manipulation Language) changes the **data**: `INSERT`, `UPDATE`, `DELETE`.
+
+<Entry term="CREATE TABLE">
+<Fragment slot="code">
+
+```sql run
+CREATE TABLE stars (
+  id INT PRIMARY KEY,
+  name VARCHAR(100),
+  age INT,
+  income DECIMAL(5,2)
+);
+SELECT * FROM stars;
+```
+
+</Fragment>
+
+Creates a new table in the database.
+
+- **Table naming**: clear, lowercase names with underscores
+- **Records and fields**: rows are records, columns are fields
+- **Field naming**: singular, lowercase names with underscores
+- **Unique identifiers**: each table should have a unique key field
+- **Table organisation**: separate related data into different tables
+
+</Entry>
+
+<Entry term="ALTER TABLE … ADD COLUMN">
+<Fragment slot="code">
+
+```sql run
+ALTER TABLE celebs
+ADD COLUMN instagram TEXT;
+
+SELECT * FROM celebs LIMIT 3;
+```
+
+</Fragment>
+
+Modifies the table's structure **without dropping** it.
+
+- `ALTER TABLE`: make the specified changes
+- `ADD COLUMN`: add a new column (<Value>name</Value> <Value>data_type</Value>)
+
+</Entry>
+
+<Entry term="INSERT INTO">
+<Fragment slot="code">
+
+```sql run
+INSERT INTO celebs (id, name, age)
+VALUES (11, 'Rich Brian', 25);
+
+SELECT * FROM celebs WHERE id = 11;
+```
+
+</Fragment>
+
+Inserts a **new row** into a table. Columns you leave out become `NULL`, or their `DEFAULT`.
+
+</Entry>
+
+<Entry term="UPDATE … SET … WHERE">
+<Fragment slot="code">
+
+```sql run
+UPDATE celebs
+SET twitter_handle = '@taylorswift13'
+WHERE id = 4;
+
+SELECT * FROM celebs WHERE id = 4;
+```
+
+</Fragment>
+
+Edits existing records.
+
+- `UPDATE`: the table to edit
+- `SET`: the column to change
+- `WHERE`: which row(s) to update
+
+:::caution
+Omitting `WHERE` updates **every single row** in the table.
+:::
+
+</Entry>
+
+<Entry term="DELETE FROM … WHERE">
+<Fragment slot="code">
+
+```sql run
+DELETE FROM celebs
+WHERE twitter_handle IS NULL;
+
+SELECT * FROM celebs;
+```
+
+</Fragment>
+
+Deletes one or more rows.
+
+- `DELETE FROM`: the table to delete rows from
+- `WHERE`: which rows to delete
+- `IS NULL`: true when the value is NULL
+
+:::caution
+Omitting `WHERE` deletes **all rows**, leaving an empty table.
+:::
+
+</Entry>
+
+<Entry term="CREATE VIEW">
+<Fragment slot="code">
+
+```sql run
+CREATE VIEW hire_years AS
+SELECT name, year_hired
+FROM employee;
+
+SELECT * FROM hire_years;
+```
+
+</Fragment>
+
+Saves a recurring, complex `SELECT` as a <Concept>virtual table</Concept>, so later queries stay clean.
+
+</Entry>

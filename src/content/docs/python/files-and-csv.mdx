@@ -1,0 +1,176 @@
+---
+title: Files & CSV
+description: Opening, reading and writing .txt files, and reading/writing CSV files with the csv module.
+sidebar:
+  order: 9
+flashcards:
+  - q: How do you read a whole file into one string?
+    a: "`open('name of file').read()`"
+  - q: How do you get a file as a list of lines?
+    a: "`open('name of file').readlines()`"
+  - q: What does the `'w'` in `open('file.txt', 'w')` mean?
+    a: Write mode. It creates the file (or empties it) so you can write. `'r'` is read mode, `'a'` is append.
+  - q: Why use `with open(...) as f:`?
+    a: It closes the file automatically when the block ends.
+  - q: Which csv tool gives each row as a dictionary?
+    a: "`csv.DictReader(f)`, e.g. `line['name']`"
+  - q: How do you read a file separated by `_` instead of commas?
+    a: "`csv.reader(f, delimiter='_')`"
+  - q: What does CSV stand for?
+    a: Comma Separated Values
+---
+
+import { Concept, Value, Entry, RunPython } from '@components';
+
+## Text files (.txt)
+
+<Entry term="open() · read() · readlines()">
+<Fragment slot="code">
+
+```python
+f = open('shopping.txt')            # open
+text = open('shopping.txt').read()  # whole file
+lines = open('shopping.txt').readlines()  # list of lines
+
+for line in open('shopping.txt'):   # loop line by line
+    print(line.strip())
+```
+
+</Fragment>
+
+- `.read()` gives one big string.
+- `.readlines()` gives a list, one item per line.
+- Looping over the file reads **line by line**.
+
+</Entry>
+
+<Entry term="Writing: write() or print(file=)">
+<Fragment slot="code">
+
+```python
+f = open('notes.txt', 'w')
+f.write('something\n')
+print('smth', file=f)   # another way
+f.close()
+```
+
+</Fragment>
+
+The `'w'` sets it to <Concept>write mode</Concept>. Use `f.close()` to close the file when you're done.
+
+</Entry>
+
+<Entry term="with open(...) as …">
+<Fragment slot="code">
+
+```python
+with open('shopping.txt', 'r') as shopping:
+    contents = shopping.read()
+```
+
+</Fragment>
+
+The safest way: the file is **closed automatically** at the end of the block.
+
+</Entry>
+
+<RunPython files={{ 'shopping.txt': 'apples\nbread\nmilk\n' }} code={`with open('shopping.txt') as shopping:
+    for line in shopping:
+        print('-', line.strip())
+
+with open('shopping.txt', 'a') as f:   # 'a' = add to the end
+    print('eggs', file=f)
+
+print(open('shopping.txt').readlines())`} />
+
+## CSV: Comma Separated Values
+
+<Entry term="csv.reader">
+<Fragment slot="code">
+
+```python
+import csv
+with open('example.csv', newline='') as f:
+    for row in csv.reader(f):
+        print(row)
+```
+
+</Fragment>
+
+Each row comes back as a **list**.
+
+</Entry>
+
+<Entry term="delimiter=">
+<Fragment slot="code">
+
+```python
+# file: name_city_age
+#       lisa_Springfield_8
+for row in csv.reader(f, delimiter='_'):
+    print(row)
+```
+
+</Fragment>
+
+Use another character instead of a comma.
+
+</Entry>
+
+<Entry term="csv.DictReader">
+<Fragment slot="code">
+
+```python
+import csv
+with open('example.csv', newline='') as f:
+    for line in csv.DictReader(f):
+        print(line['name'], 'is', line['age'],
+              'and lives in', line['city'])
+```
+
+</Fragment>
+
+Each row becomes a **dictionary**, using the first line as the keys.
+
+</Entry>
+
+<RunPython files={{ 'example.csv': 'name,city,age\nLisa,Springfield,8\nSirius,London,35\n' }} code={`import csv
+with open('example.csv', newline='') as f:
+    for line in csv.DictReader(f):
+        print(line)
+        print(line['name'], 'is', line['age'], 'and lives in', line['city'])`} />
+
+<Entry term="csv.writer · csv.DictWriter">
+<Fragment slot="code">
+
+```python
+import csv
+with open('outfile.csv', 'w') as f:
+    writer = csv.writer(f)
+    writer.writerow(['Hello', 'World!', 'Grok'])
+    writer.writerow(['Hello'] * 3 + ['World!'])
+
+with open('outfile.csv', 'w') as f:
+    writer = csv.DictWriter(f, fieldnames=['name', 'age'])
+    writer.writerow({'age': '65', 'name': 'Polly'})
+```
+
+</Fragment>
+
+- `csv.writer` writes **lists** as rows.
+- `csv.DictWriter` writes **dictionaries**. `fieldnames` sets the column order.
+
+</Entry>
+
+```python run
+import csv
+with open('outfile.csv', 'w', newline='') as f:
+    writer = csv.DictWriter(f, fieldnames=['name', 'age'])
+    writer.writeheader()
+    writer.writerow({'age': '65', 'name': 'Polly'})
+    writer.writerow({'age': '18', 'name': 'Amelia'})
+
+with open('outfile.csv') as f:
+    print(f.read().strip())
+```
+

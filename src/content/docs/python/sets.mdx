@@ -1,0 +1,67 @@
+---
+title: Sets
+description: Unique unordered values, set maths (union, intersection, difference), subsets.
+sidebar:
+  order: 8
+flashcards:
+  - q: What are the symbols for union, intersection, difference and symmetric difference?
+    a: "`a | b` union, `a & b` intersection, `a - b` difference, `a ^ b` symmetric difference"
+  - q: What does `a - b` give?
+    a: What's in a but not in b.
+  - q: What does `a ^ b` give?
+    a: Everything that is in a or b but not both.
+  - q: Can you index a set, like `numbers[1]`?
+    a: No. Sets have no order, so they can't be indexed.
+  - q: What does "hashable" mean?
+    a: Immutable. Only hashable things can be set items or dictionary keys (so a list can't go in a set).
+  - q: What do `issubset`, `issuperset` and `isdisjoint` check?
+    a: "subset: all of c is in a. superset: c has all of a. disjoint: they share nothing (empty intersection)."
+---
+
+import { Concept, Entry } from '@components';
+
+A <Concept>set</Concept> is like a set in maths (the circle diagrams): unique values, no order, e.g. `{1, 2, 3, 5, 6, 7}`.
+
+- A set **cannot be indexed** (`numbers[1]` doesn't work).
+- Lists **cannot** be added to a set.
+- Only <Concept>hashable</Concept> (= immutable) objects can go into sets or be dictionary keys.
+
+## Making & changing
+
+| Code | What it does |
+| --- | --- |
+| `set(variable)` | Convert a list to a set (removes duplicates) |
+| `variable.add(smth)` | Add an item |
+| `variable.remove(smth)` | Remove an item |
+
+## Set maths
+
+With `a = {1, 2, 3}` and `b = {3, 4, 5}`:
+
+| Code | Result | Name |
+| --- | --- | --- |
+| `a \| b` | `{1, 2, 3, 4, 5}` | Union: everything |
+| `a & b` | `{3}` | Intersection: in both |
+| `a - b` | `{1, 2}` | Difference: in a, not in b |
+| `b - a` | `{4, 5}` | Difference: in b, not in a |
+| `a ^ b` | `{1, 2, 4, 5}` | Symmetric difference: in one but not both |
+
+## Comparing sets
+
+| Code | True when |
+| --- | --- |
+| `c.issubset(a)` | All elements of c are in a |
+| `c.issuperset(a)` | c has all the elements of a |
+| `c.isdisjoint(a)` | c and a share nothing (empty intersection) |
+
+```python run
+a = {1, 2, 3}
+b = {3, 4, 5}
+print(a | b, a & b, a - b, b - a, a ^ b)
+
+c = {1, 2}
+print(c.issubset(a), a.issuperset(c), c.isdisjoint(b))
+
+print(set(['x', 'y', 'x']))  # duplicates removed
+```
+

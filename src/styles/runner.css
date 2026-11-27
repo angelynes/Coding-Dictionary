@@ -1,0 +1,126 @@
+/* Shared styles for <run-python> and <run-sql> */
+run-python,
+run-sql {
+	display: block;
+	border: 1px solid var(--cd-card-border);
+	border-radius: 0.6rem;
+	overflow: hidden;
+	background: var(--cd-card-bg);
+	margin-top: 1rem;
+}
+.rc-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.35rem 0.5rem 0.35rem 0.8rem;
+	background: var(--cd-term-bg);
+	border-bottom: 1px solid var(--cd-card-border);
+	font-size: var(--sl-text-xs);
+}
+.rc-lang {
+	font-weight: 600;
+	color: var(--sl-color-accent-high);
+}
+.rc-hint {
+	color: var(--sl-color-gray-3);
+	margin-inline-end: auto;
+}
+.rc-bar button {
+	font: inherit;
+	cursor: pointer;
+	border-radius: 0.35rem;
+	padding: 0.25rem 0.65rem;
+	border: 1px solid var(--cd-card-border);
+	background: transparent;
+	color: var(--sl-color-gray-2);
+}
+.rc-bar button:hover {
+	color: var(--sl-color-white);
+	border-color: var(--sl-color-accent);
+}
+.rc-bar button.rc-run {
+	background: var(--sl-color-accent);
+	border-color: var(--sl-color-accent);
+	color: var(--sl-color-black);
+	font-weight: 600;
+}
+:root[data-theme='light'] .rc-bar button.rc-run {
+	color: #fff;
+}
+.rc-bar button:disabled {
+	opacity: 0.6;
+	cursor: progress;
+}
+.rc-editor {
+	display: block;
+	width: 100%;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0.75rem 0.9rem;
+	border: 0;
+	resize: vertical;
+	background: var(--cd-card-bg);
+	color: var(--sl-color-white);
+	font-family: var(--__sl-font-mono);
+	font-size: var(--sl-text-sm);
+	line-height: 1.55;
+	tab-size: 4;
+	white-space: pre;
+	overflow-x: auto;
+}
+.rc-editor:focus {
+	outline: 2px solid var(--sl-color-accent);
+	outline-offset: -2px;
+}
+.rc-out {
+	margin: 0 !important;
+	border-top: 1px dashed var(--cd-card-border);
+	background: var(--cd-output-bg);
+	padding: 0.7rem 0.9rem;
+	font-family: var(--__sl-font-mono);
+	font-size: var(--sl-text-sm);
+	max-height: 26rem;
+	overflow: auto;
+}
+.rc-out[hidden] {
+	display: none;
+}
+.rc-out pre {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+.rc-out .rc-err {
+	color: var(--cd-err);
+}
+.rc-out .rc-ok {
+	color: var(--cd-ok);
+}
+.rc-out .rc-muted {
+	color: var(--sl-color-gray-3);
+}
+.rc-out table {
+	display: table;
+	width: auto;
+	margin: 0.25rem 0 0.75rem !important;
+	font-size: var(--sl-text-xs);
+	border-collapse: collapse;
+}
+.rc-out th,
+.rc-out td {
+	padding: 0.25rem 0.7rem;
+	border: 1px solid var(--cd-card-border);
+	text-align: start;
+	white-space: nowrap;
+}
+.rc-out th {
+	background: var(--cd-header-bg);
+	color: var(--cd-header-fg);
+}
+.rc-out td.rc-null {
+	color: var(--sl-color-gray-3);
+	font-style: italic;
+}

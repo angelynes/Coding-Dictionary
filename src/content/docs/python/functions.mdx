@@ -1,0 +1,80 @@
+---
+title: Functions
+description: Built-in functions like abs(), and creating your own with def and return.
+sidebar:
+  order: 10
+flashcards:
+  - q: How do you create a function?
+    a: "`def name(argument):` then the indented body"
+  - q: What does `return` do?
+    a: Ends the function and gives the result back to the caller.
+  - q: What is an argument?
+    a: The value you pass into a function, e.g. `hello` in `def name(hello):`
+  - q: What does `abs()` do?
+    a: Gives the absolute value (removes the minus sign). `abs(-5)` is `5`.
+---
+
+import { Value, Concept, Entry } from '@components';
+
+<Entry term="abs()">
+<Fragment slot="code">
+
+```python
+print(abs(-7))   # 7
+```
+
+</Fragment>
+
+The <Concept>absolute value</Concept>: how far a number is from 0.
+
+</Entry>
+
+<Entry term="def">
+<Fragment slot="code">
+
+```python
+def greet(name):
+    print('Hello', name)
+
+greet('Angel')
+```
+
+</Fragment>
+
+Creates a function.
+
+- `greet`: the <Value>function name</Value>
+- `name`: the <Concept>argument</Concept> (input)
+
+</Entry>
+
+<Entry term="return">
+<Fragment slot="code">
+
+```python
+def add(x, y):
+    return x + y
+
+total = add(2, 3)   # 5
+```
+
+</Fragment>
+
+`return` **ends** the running function and **gives the result back** to the caller, so you can store it in a variable.
+
+</Entry>
+
+```python run
+def add(x, y):
+    return x + y
+
+def describe(n):
+    if n % 2 == 0:
+        return 'even'
+    return 'odd'
+
+print(add(2, 3))
+print(describe(7), describe(10))
+print(abs(-4.5))
+```
+

@@ -1,0 +1,204 @@
+---
+title: Strings
+description: Counting, indexing, slicing, replacing, splitting, upper/lower case and the string module.
+sidebar:
+  order: 4
+flashcards:
+  - q: How do you count how many times `'l'` appears in a string?
+    a: "`variable.count('l')`"
+  - q: How do you get the number of characters in a string?
+    a: "`len(variable)`"
+  - q: How do you get the first and the last letter?
+    a: "`variable[0]` and `variable[-1]`"
+  - q: How do you get the first 5 characters?
+    a: "`variable[:5]`"
+  - q: How do you reverse a string?
+    a: "`variable[::-1]`"
+  - q: How do you replace every `#` with `o`?
+    a: "`variable.replace('#', 'o')`"
+  - q: How do you remove spaces at the end of a string?
+    a: "`variable.rstrip()` (`strip()` removes them from both ends)"
+  - q: How do you split `'Nicky:cockatiel:Cheeky'` into 3 variables at once?
+    a: "`name, pet_type, pet_name = line.split(':')`"
+  - q: Name the upper / lower case methods.
+    a: "`.upper()`, `.lower()`, `.isupper()`, `.islower()`, `.capitalize()`"
+---
+
+import { Value, Concept, Entry } from '@components';
+
+## Counting & finding
+
+<Entry term="count()">
+<Fragment slot="code">
+
+```python
+'hello'.count('l')   # 2
+```
+
+</Fragment>
+
+Counts how many times a <Value>substring</Value> appears.
+
+</Entry>
+
+<Entry term="len()">
+<Fragment slot="code">
+
+```python
+len('hello')   # 5
+```
+
+</Fragment>
+
+Counts the letters (characters), including spaces.
+
+</Entry>
+
+<Entry term="in · not in">
+<Fragment slot="code">
+
+```python
+'ell' in 'hello'       # True
+'z' not in 'hello'     # True
+```
+
+</Fragment>
+
+Checks if a word is **in** the string. Result: `True` / `False`.
+
+</Entry>
+
+## Indexing & slicing
+
+<Entry term="variable[0] · variable[-1]">
+<Fragment slot="code">
+
+```python
+word = 'python'
+word[0]    # 'p' (first)
+word[-1]   # 'n' (from the back)
+```
+
+</Fragment>
+
+Gets **one letter**. Counting starts at **0**. Negative numbers count from the back.
+
+</Entry>
+
+<Entry term="Slicing [start:end:step]">
+<Fragment slot="code">
+
+```python
+word[:5]     # 'pytho' (chop: first 5)
+word[2:]     # 'thon'
+word[::-1]   # 'nohtyp' (read backwards)
+```
+
+</Fragment>
+
+Takes a **chunk** of the string. The end position is not included.
+
+</Entry>
+
+```python run
+word = 'python'
+print(word[0], word[-1])
+print(word[:5])
+print(word[::-1])
+print(len(word), word.count('o'))
+```
+
+## Changing strings
+
+<Entry term="replace()">
+<Fragment slot="code">
+
+```python
+'h#ll#'.replace('#', 'o')   # 'hollo'
+```
+
+</Fragment>
+
+Replaces every `'#'` with `'o'`.
+
+</Entry>
+
+<Entry term="strip() · rstrip()">
+<Fragment slot="code">
+
+```python
+'  hi  '.rstrip()   # '  hi'
+'  hi  '.strip()    # 'hi'
+```
+
+</Fragment>
+
+Removes spaces (or new lines) from the right end (`rstrip`) or both ends (`strip`).
+
+</Entry>
+
+<Entry term="split() · multiple variables at once">
+<Fragment slot="code">
+
+```python
+line = 'Nicky:cockatiel:Cheeky'
+name, pet_type, pet_name = line.split(':')
+```
+
+</Fragment>
+
+`split()` cuts a string into a **list**. You can assign the pieces to several variables at once.
+
+</Entry>
+
+## Upper & lower case
+
+| Code | What it does |
+| --- | --- |
+| `variable.upper()` | Convert to UPPER |
+| `variable.lower()` | Convert to lower |
+| `variable.isupper()` | Check if all upper: `True` / `False` |
+| `variable.islower()` | Check if all lower |
+| `variable.capitalize()` | First letter upper, the rest lower |
+| `variable.isalpha()` | Check if all alphabetic |
+
+```python run
+name = 'angel SUSANTO'
+print(name.upper())
+print(name.lower())
+print(name.capitalize())
+print('blah'.isalpha(), 'blah1'.isalpha())
+```
+
+## String tricks: the `string` module
+
+<Entry term="import string">
+<Fragment slot="code">
+
+```python
+import string
+print(string.punctuation)  # !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+print(string.digits)       # 0123456789
+print(string.hexdigits)    # 0123456789abcdefABCDEF
+```
+
+</Fragment>
+
+Ready-made sets of characters.
+
+</Entry>
+
+<Entry term="Strip off punctuation">
+<Fragment slot="code">
+
+```python
+import string
+x = '...hello!!'
+print(x.strip(string.punctuation))   # hello
+```
+
+</Fragment>
+
+`strip()` can remove any characters you give it, not only spaces.
+
+</Entry>

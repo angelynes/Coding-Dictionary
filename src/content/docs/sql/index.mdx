@@ -1,0 +1,73 @@
+---
+title: SQL basics
+description: What SQL is, the common flavours, the order SQL actually runs in, and relational databases.
+sidebar:
+  label: Overview
+  order: 0
+flashcards:
+  - q: What does SQL stand for, and what is it for?
+    a: Structured Query Language. It manages, queries and changes data stored in relational databases.
+  - q: What does every SQL statement end with?
+    a: "A semicolon `;`"
+  - q: In what order does SQL actually run a query?
+    a: "FROM/JOIN → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT"
+  - q: Why can't you use a SELECT alias inside WHERE?
+    a: Because WHERE runs before SELECT, so the alias doesn't exist yet.
+  - q: What are a table, a column and a row?
+    a: "Table: data organised in rows and columns. Column: values of one type (e.g. age). Row: one record (e.g. id 1, Justin, 22)."
+  - q: Which SQL flavour uses T-SQL?
+    a: SQL Server (Microsoft)
+---
+
+import { Legend, Value, Concept, Entry } from '@components';
+
+<Legend />
+
+<Concept>SQL</Concept> (Structured Query Language) is designed to manage, query and manipulate data stored in relational databases. Statements end with `;`.
+
+## Common flavours
+
+- **PostgreSQL**: open-source, developed at UC Berkeley, supported by DARPA
+- **SQL Server**: developed by Microsoft, uses T-SQL
+- **SQLite**: a tiny database stored in one file. The runnable boxes here use it.
+- **MySQL**
+
+## SQL execution order
+
+SQL **doesn't run top-to-bottom**. It runs in this order:
+
+| # | Clause | Job |
+| --- | --- | --- |
+| 1 | `FROM` / `JOIN` | Locate and combine tables |
+| 2 | `WHERE` | Filter raw rows |
+| 3 | `GROUP BY` | Collapse rows into buckets |
+| 4 | `HAVING` | Filter aggregated buckets |
+| 5 | `SELECT` | Emit columns and compute expressions |
+| 6 | `DISTINCT` | Eliminate duplicate rows |
+| 7 | `ORDER BY` | Sort final rows |
+| 8 | `LIMIT` | Restrict row count |
+
+:::tip
+This is why you **can't** use a `SELECT` alias inside `WHERE` (WHERE runs first), but you **can** use it in `ORDER BY`.
+:::
+
+## Relational databases
+
+A <Concept>relational database</Concept> is a database that organises information into one or more tables.
+
+<Entry term="SELECT … FROM …">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs;
+
+SELECT id, name FROM celebs;
+```
+
+</Fragment>
+
+- <Concept>table</Concept> (relation): a collection of data organised into rows and columns
+- <Concept>column</Concept>: a set of data values of one type (e.g. id, name, age)
+- <Concept>row</Concept>: a single record in a table (e.g. id 1, name Justin, age 22)
+
+</Entry>

@@ -1,0 +1,210 @@
+---
+title: Conditionals & loops
+description: if / elif / else, in, for loops, range, while, break, continue, boolean flags, and / or.
+sidebar:
+  order: 3
+flashcards:
+  - q: What are the three parts of an if statement?
+    a: "`if … :`, `elif … :` (else if), `else:`"
+  - q: How do you check whether something is inside a string or list?
+    a: "`if 'a' in word:`, or `not in` for the opposite"
+  - q: What are the 3 values in `range(start, end, step)`?
+    a: Where to start, where to stop (not included), and how much to jump each time.
+  - q: What is the difference between `break` and `continue`?
+    a: "`break` stops the whole loop. `continue` skips the rest of this round and goes on to the next one."
+  - q: When does a `while` loop stop?
+    a: When its condition becomes False (or when it hits `break`).
+  - q: What is a boolean flag?
+    a: "A variable set to True or False that you change after something happens, e.g. `cat_seen = False` then later `cat_seen = True`."
+---
+
+import { Keyword, Value, Concept, Entry } from '@components';
+
+## Conditions
+
+<Entry term="if · elif · else">
+<Fragment slot="code">
+
+```python
+if grade == 'A':
+    print('Excellent')
+elif grade == 'B':
+    print('Good')
+else:
+    print('Keep going')
+```
+
+</Fragment>
+
+Runs the **first** block whose condition is <Keyword>True</Keyword>. `else` runs when nothing above matched.
+
+</Entry>
+
+<Entry term="in · not in">
+<Fragment slot="code">
+
+```python
+if 'a' in word:
+    print('has an a')
+if 'z' not in word:
+    print('no z')
+```
+
+</Fragment>
+
+Checks whether something is **inside** a string, list, tuple, set or dictionary keys.
+
+</Entry>
+
+<Entry term="is True · True / False">
+<Fragment slot="code">
+
+```python
+if raining is True:
+    print('Bring an umbrella')
+# shorter, and more common:
+if raining:
+    print('Bring an umbrella')
+```
+
+</Fragment>
+
+<Keyword>True</Keyword> / <Keyword>False</Keyword> are the two Boolean values.
+
+</Entry>
+
+<Entry term="and · or">
+<Fragment slot="code">
+
+```python
+if age >= 13 and age <= 19:
+    print('teenager')
+if day == 'Sat' or day == 'Sun':
+    print('weekend')
+```
+
+</Fragment>
+
+- `and`: **both** conditions must be True.
+- `or`: **at least one** must be True.
+
+</Entry>
+
+```python run
+word = 'banana'
+if 'z' in word:
+    print('has z')
+elif word.count('a') >= 3:
+    print('lots of a')
+else:
+    print('nothing special')
+```
+
+## Loops
+
+<Entry term="Looping a string / list">
+<Fragment slot="code">
+
+```python
+for letter in 'hello':
+    print(letter)
+```
+
+</Fragment>
+
+`for` <Value>variable</Value> `in` … `:` takes each item, one at a time.
+
+</Entry>
+
+<Entry term="Looping numbers: range()">
+<Fragment slot="code">
+
+```python
+for i in range(0, 10, 2):
+    print(i)   # 0 2 4 6 8
+```
+
+</Fragment>
+
+`range(`<Value>start</Value>`, `<Value>end</Value>`, `<Value>step</Value>`)`. The **end is not included**.
+
+</Entry>
+
+<Entry term="while">
+<Fragment slot="code">
+
+```python
+count = 3
+while count > 0:
+    print(count)
+    count = count - 1
+print('Lift off!')
+```
+
+</Fragment>
+
+Keeps looping **while** the condition is True, until it counts down or the condition changes.
+
+</Entry>
+
+<Entry term="break">
+<Fragment slot="code">
+
+```python
+for i in range(0, 5):
+    if i == 2:
+        break
+    print(i, 'is not 2')
+print('outside the loop')
+```
+
+</Fragment>
+
+<Keyword>break</Keyword> **stops the loop** completely and jumps to the code after it.
+
+</Entry>
+
+<Entry term="continue">
+<Fragment slot="code">
+
+```python
+for i in range(0, 5):
+    if i == 2:
+        continue
+    print(i, 'is not 2')
+```
+
+</Fragment>
+
+<Keyword>continue</Keyword> **skips the rest of this round** and carries on with the next item instead of stopping.
+
+</Entry>
+
+Compare `break` and `continue`. Change `break` to `continue` and run it again:
+
+```python run
+for i in range(0, 5):
+    if i == 2:
+        break
+    print(i, 'is not 2')
+print('outside the loop')
+```
+
+## Boolean flag
+
+<Entry term="Boolean flag">
+<Fragment slot="code">
+
+```python
+cat_seen = False
+for animal in ['dog', 'cat', 'bird']:
+    if animal == 'cat':
+        cat_seen = True
+print(cat_seen)   # True
+```
+
+</Fragment>
+
+Set a value to `True` or `False` first, then **change it after certain actions** take place.
+
+</Entry>

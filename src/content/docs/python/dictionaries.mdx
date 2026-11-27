@@ -1,0 +1,112 @@
+---
+title: Dictionaries
+description: Key and value pairs; taking, adding, changing and looping over values.
+sidebar:
+  order: 6
+flashcards:
+  - q: How do you get the value for key `'a'`?
+    a: "`dictionary['a']`"
+  - q: How do you add or change a definition?
+    a: "`dictionary['d'] = 'durian'` (adds it if it's new, changes it if it exists)"
+  - q: What does `dictionary.get(key, default)` do?
+    a: Returns the value for key, or the default if the key isn't in the dictionary (no error).
+  - q: How do you merge dictionary2 into dictionary1?
+    a: "`dictionary1.update(dictionary2)`"
+  - q: How do you loop over keys and values together?
+    a: "`for key, value in dictionary.items():`"
+  - q: What does `.values()` give?
+    a: All the values (definitions) without the keys.
+---
+
+import { Value, Concept, Entry } from '@components';
+
+A <Concept>dictionary</Concept> stores **key: value** pairs (words with definitions), e.g. `{'a': 'apple', 'b': 'blueberry', 'c': 'carrot'}`.
+
+## Reading & changing
+
+<Entry term="Taking values">
+<Fragment slot="code">
+
+```python
+dictionary['a']   # 'apple'
+```
+
+</Fragment>
+
+Look up a value by its <Value>key</Value>.
+
+</Entry>
+
+<Entry term="Adding / changing a definition">
+<Fragment slot="code">
+
+```python
+dictionary['a'] = 'ant'      # change
+dictionary['d'] = 'durian'   # add
+```
+
+</Fragment>
+
+The same syntax **changes** an existing key or **adds** a new one.
+
+</Entry>
+
+<Entry term="get()">
+<Fragment slot="code">
+
+```python
+fruit = dictionary.get('z', 'unknown')
+```
+
+</Fragment>
+
+Returns the value, or a <Value>default</Value> when the key isn't in the dictionary, instead of crashing.
+
+</Entry>
+
+<Entry term="update()">
+<Fragment slot="code">
+
+```python
+dictionary1.update(dictionary2)
+```
+
+</Fragment>
+
+Adds more keys, or changes the definition of existing ones, using another dictionary.
+
+</Entry>
+
+<Entry term="Splitting and defining">
+<Fragment slot="code">
+
+```python
+line = 'Angel 91234567'
+name, number = line.split()
+phonebook[name] = number
+```
+
+</Fragment>
+
+Split an input into parts and store them as `{name: number}`.
+
+</Entry>
+
+## Looping
+
+| Code | Gives |
+| --- | --- |
+| `for key in dictionary:` | Each key |
+| `dictionary.values()` | Each value |
+| `dictionary.items()` | Each pair, e.g. `('a', 'apple')` |
+
+```python run
+food = {'a': 'apple', 'b': 'blueberry', 'c': 'carrot'}
+food['a'] = 'ant'
+food['d'] = 'durian'
+print(food.get('z', 'not found'))
+
+for key, value in food.items():
+    print(key, '->', value)
+```
+

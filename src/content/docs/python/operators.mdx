@@ -1,0 +1,54 @@
+---
+title: Operators (symbols)
+description: Maths and comparison symbols in Python.
+sidebar:
+  order: 1
+flashcards:
+  - q: What does `**` do?
+    a: Power of. `2 ** 3` is `8`
+  - q: What does `%` do?
+    a: Gives the remainder from division. `7 % 3` is `1`
+  - q: What is the difference between `=` and `==`?
+    a: "`=` stores a value in a variable. `==` checks if two values are equal (gives True / False)."
+  - q: How do you write "not equal to"?
+    a: "`!=`"
+  - q: What does `/` give for `7 / 2`? And `7 // 2`?
+    a: "`7 / 2` is `3.5` (always a float). `7 // 2` is `3` (floor division, drops the decimals)."
+---
+
+import { Concept } from '@components';
+
+## Maths
+
+| Symbol | Meaning | Example | Result |
+| --- | --- | --- | --- |
+| `+` | Addition | `5 + 2` | `7` |
+| `-` | Subtraction | `5 - 2` | `3` |
+| `*` | Multiplication | `5 * 2` | `10` |
+| `/` | Division | `5 / 2` | `2.5` |
+| `//` | Floor division (whole number part) | `5 // 2` | `2` |
+| `**` | Power of | `5 ** 2` | `25` |
+| `%` | Remainder from division | `5 % 2` | `1` |
+
+## Comparisons
+
+Comparisons give a <Concept>Boolean</Concept> result: `True` or `False`.
+
+| Symbol | Meaning |
+| --- | --- |
+| `==` | Equal to |
+| `!=` | Not equal to |
+| `<` | Less than |
+| `<=` | Less than or equal to |
+| `>` | More than |
+| `>=` | More than or equal to |
+
+```python run
+print(5 + 2, 5 - 2, 5 * 2, 5 / 2)
+print(5 // 2, 5 ** 2, 5 % 2)
+print(5 == 2, 5 != 2, 5 > 2, 5 <= 2)
+```
+
+:::tip
+`%` is handy for checking even or odd numbers: `number % 2 == 0` means the number is even.
+:::

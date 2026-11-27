@@ -1,0 +1,117 @@
+---
+/**
+ * Editable, runnable SQL box. Runs SQLite in the browser (sql.js) against
+ * the sample database in src/data/sample-db.sql. The database is rebuilt
+ * fresh on every run, so UPDATE / DELETE examples never break anything.
+ *
+ * <RunSQL code={`SELECT * FROM celebs;`} />
+ */
+import '../styles/runner.css';
+
+interface Props {
+	code: string;
+	title?: string;
+}
+const { code, title = 'SQL' } = Astro.props;
+const clean = code.replace(/^\n+|\s+$/g, '');
+---
+
+<run-sql class="not-content">
+	<div class="rc-bar">
+		<span class="rc-lang">🗄️ {title}</span>
+		<span class="rc-hint"><a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/sql/sample-database/`}>sample database</a> · ⌘/Ctrl + Enter</span>
+		<button type="button" data-act="reset">Reset</button>
+		<button type="button" data-act="run" class="rc-run">▶ Run</button>
+	</div>
+	<textarea class="rc-editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL code" data-original={clean}>{clean}</textarea>
+	<div class="rc-out" aria-live="polite" hidden></div>
+</run-sql>
+
+<script>
+	import seed from '../data/sample-db.sql?raw';
+	import { enhanceEditor, loadScript, escapeHtml } from './editor';
+
+	const SQLJS = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/';
+	let sqlReady: Promise<any> | undefined;
+
+	function getSQL() {
+		sqlReady ??= loadScript(SQLJS + 'sql-wasm.js').then(() =>
+			(window as any).initSqlJs({ locateFile: (f: string) => SQLJS + f }),
+		);
+		sqlReady.catch(() => (sqlReady = undefined));
+		return sqlReady;
+	}
+
+	function table(cols: string[], rows: unknown[][]) {
+		const head = cols.map((c) => `<th>${escapeHtml(c)}</th>`).join('');
+		const body = rows
+			.slice(0, 200)
+			.map(
+				(r) =>
+					'<tr>' +
+					r.map((v) => (v === null ? '<td class="rc-null">NULL</td>' : `<td>${escapeHtml(String(v))}</td>`)).join('') +
+					'</tr>',
+			)
+			.join('');
+		const more = rows.length > 200 ? `<div class="rc-muted">…showing 200 of ${rows.length} rows</div>` : '';
+		return `<table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table><div class="rc-muted">${rows.length} row${rows.length === 1 ? '' : 's'}</div>${more}`;
+	}
+
+	class RunSQL extends HTMLElement {
+		connectedCallback() {
+			const ta = this.querySelector('textarea')!;
+			const out = this.querySelector<HTMLElement>('.rc-out')!;
+			const runBtn = this.querySelector<HTMLButtonElement>('[data-act=run]')!;
+
+			const run = async () => {
+				runBtn.disabled = true;
+				out.hidden = false;
+				out.innerHTML = '<span class="rc-muted">Loading SQLite…</span>';
+				let db: any;
+				try {
+					const SQL = await getSQL();
+					db = new SQL.Database();
+					db.exec(seed);
+					const parts: string[] = [];
+					let changed = 0;
+					let statements = 0;
+					for (const stmt of db.iterateStatements(ta.value)) {
+						statements++;
+						const cols: string[] = stmt.getColumnNames();
+						if (cols.length) {
+							const rows: unknown[][] = [];
+							while (stmt.step()) rows.push(stmt.get());
+							parts.push(table(cols, rows));
+						} else {
+							stmt.step();
+							changed += db.getRowsModified();
+						}
+						stmt.free();
+					}
+					if (!parts.length) {
+						parts.push(
+							statements
+								? `<span class="rc-ok">✓ Done. ${changed} row${changed === 1 ? '' : 's'} changed.</span> <span class="rc-muted">Add a SELECT to see the table.</span>`
+								: '<span class="rc-muted">Nothing to run.</span>',
+						);
+					}
+					out.innerHTML = parts.join('');
+				} catch (err: any) {
+					out.innerHTML = `<span class="rc-err">Error: ${escapeHtml(err.message || String(err))}</span>`;
+				} finally {
+					db?.close();
+					runBtn.disabled = false;
+				}
+			};
+
+			const fit = enhanceEditor(ta, run);
+			runBtn.addEventListener('click', run);
+			this.querySelector('[data-act=reset]')!.addEventListener('click', () => {
+				ta.value = ta.dataset.original ?? '';
+				fit();
+				out.hidden = true;
+			});
+		}
+	}
+	customElements.define('run-sql', RunSQL);
+</script>

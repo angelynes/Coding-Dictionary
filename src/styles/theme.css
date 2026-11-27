@@ -1,0 +1,93 @@
+/* ------------------------------------------------------------------
+   Coding Dictionary theme
+   Based on the original Google Docs: lavender section headers and the
+   colour legend  Value (blue) | CODE (ink) | CONCEPT (red).
+------------------------------------------------------------------- */
+
+/* Dark mode (Starlight default) */
+:root {
+	--sl-color-accent-low: #2a2140;
+	--sl-color-accent: #9d84e0;
+	--sl-color-accent-high: #ddd2fa;
+
+	--cd-value: #7fb2ff;
+	--cd-concept: #ff7a7a;
+	--cd-keyword: #ffab5e;
+	--cd-header-bg: #3a2f57;
+	--cd-header-fg: #efe9fb;
+	--cd-card-bg: #1c1a24;
+	--cd-card-border: #3a3550;
+	--cd-term-bg: #2a2140;
+	--cd-output-bg: #14131a;
+	--cd-ok: #6fd39a;
+	--cd-err: #ff8a8a;
+}
+
+/* Light mode */
+:root[data-theme='light'] {
+	--sl-color-accent-low: #ece6fa;
+	--sl-color-accent: #6a4bbd;
+	--sl-color-accent-high: #2e1f5c;
+
+	--cd-value: #1a5fd0;
+	--cd-concept: #d32f2f;
+	--cd-keyword: #d9700b;
+	--cd-header-bg: #e3dcf5;
+	--cd-header-fg: #241a40;
+	--cd-card-bg: #ffffff;
+	--cd-card-border: #d9d3ea;
+	--cd-term-bg: #f3effc;
+	--cd-output-bg: #f7f6fb;
+	--cd-ok: #1d7a46;
+	--cd-err: #c62828;
+}
+
+/* Section headers look like the lavender highlight in the docs */
+.sl-markdown-content h2 {
+	display: inline-block;
+	background: var(--cd-header-bg);
+	color: var(--cd-header-fg);
+	padding: 0.15em 0.5em;
+	border-radius: 0.35em;
+	font-size: var(--sl-text-xl);
+}
+.sl-markdown-content .sl-heading-wrapper.level-h2 {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+.sl-markdown-content .sl-heading-wrapper.level-h2 .sl-anchor-link {
+	position: static;
+	margin: 0;
+}
+
+/* Inline legend colours */
+.cd-value {
+	color: var(--cd-value);
+	font-style: italic;
+}
+.cd-concept {
+	color: var(--cd-concept);
+	font-weight: 600;
+}
+.cd-keyword {
+	color: var(--cd-keyword);
+	font-family: var(--__sl-font-mono);
+	font-size: 0.92em;
+}
+
+/* Tables: a bit tighter, so they read like the symbol tables in the docs */
+.sl-markdown-content table code {
+	white-space: nowrap;
+}
+
+/* Note callouts (the "*" notes in the docs) */
+.cd-note {
+	color: var(--sl-color-gray-2);
+	font-size: var(--sl-text-sm);
+}
+
+/* A little wider than Starlight's default, so code + explanation fit side by side */
+:root {
+	--sl-content-width: 52rem;
+}

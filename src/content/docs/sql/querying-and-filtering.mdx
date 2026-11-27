@@ -1,0 +1,229 @@
+---
+title: Querying, aliasing & filtering
+description: Quoted column names, AS, DISTINCT, WHERE, LIKE, BETWEEN, IN, AND / OR, CASE.
+sidebar:
+  order: 5
+flashcards:
+  - q: How do you select a column with a space in its name?
+    a: 'Wrap it in double quotes: `SELECT "facebook likes" FROM reviews;`'
+  - q: What does AS do?
+    a: Gives a column or table an alias (nickname) so the results are easier to read.
+  - q: What does DISTINCT do with multiple columns?
+    a: Returns unique combinations of those columns.
+  - q: How do you count unique countries?
+    a: "`SELECT COUNT(DISTINCT country) FROM films;`"
+  - q: In LIKE, what do `%` and `_` mean?
+    a: "`%` = zero, one or many characters. `_` = exactly one character."
+  - q: Is BETWEEN inclusive?
+    a: "Yes, both ends are included: `BETWEEN 20 AND 30` includes 20 and 30."
+  - q: What is IN a shortcut for?
+    a: "Several OR conditions: `age IN (20, 22, 25)` = `age = 20 OR age = 22 OR age = 25`"
+  - q: What does CASE return for rows that match no WHEN and have no ELSE?
+    a: "NULL"
+  - q: What does `END AS age_group` do in a CASE?
+    a: Ends the CASE and names the new column.
+---
+
+import { Value, Concept, Entry } from '@components';
+
+## Selecting & aliasing
+
+<Entry term='"column name with spaces"'>
+<Fragment slot="code">
+
+```sql run
+SELECT film_id, "facebook likes"
+FROM reviews;
+```
+
+</Fragment>
+
+Non-standard names: if a column has spaces or special characters, wrap it in **double quotes** `"…"`.
+
+</Entry>
+
+<Entry term="AS">
+<Fragment slot="code">
+
+```sql run
+SELECT name AS Title
+FROM celebs;
+
+SELECT f.title, r.imdb_score
+FROM films AS f
+JOIN reviews AS r ON r.film_id = f.id;
+```
+
+</Fragment>
+
+Aliases a **column** or **table** name to make results easier to read. E.g. `devices_specs AS dsp`, then use `dsp` everywhere.
+
+</Entry>
+
+<Entry term="DISTINCT">
+<Fragment slot="code">
+
+```sql run
+SELECT DISTINCT age FROM celebs;
+
+SELECT DISTINCT name, age FROM employees;
+
+SELECT COUNT(DISTINCT country) FROM films;
+```
+
+</Fragment>
+
+Returns only **unique** values.
+
+- With multiple fields, you get unique **combinations**.
+- `COUNT(DISTINCT …)` counts the unique values.
+
+</Entry>
+
+## Filtering with WHERE
+
+<Entry term="WHERE">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+WHERE age > 30;
+
+SELECT * FROM films
+WHERE language = 'Spanish';
+```
+
+</Fragment>
+
+Filters the results to only the rows that **fulfil a condition**.
+
+</Entry>
+
+<Entry term="LIKE · NOT LIKE">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+WHERE name LIKE 'J%';
+
+SELECT * FROM celebs
+WHERE name NOT LIKE 'J%';
+
+SELECT * FROM celebs
+WHERE name LIKE '_d%';
+```
+
+</Fragment>
+
+Searches for a **pattern** in a column.
+
+- `%`: zero, one or many characters. `'J%'` = starts with J
+- `_`: exactly **one** character. `'_d%'` = second letter is d
+
+</Entry>
+
+<Entry term="BETWEEN … AND …">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+WHERE age BETWEEN 20 AND 30;
+```
+
+</Fragment>
+
+Selects values within a range, **including both ends**.
+
+</Entry>
+
+<Entry term="IN (…, …, …)">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+WHERE age IN (22, 26, 33);
+```
+
+</Fragment>
+
+Lets you list multiple values. A shorthand for several `OR` conditions.
+
+</Entry>
+
+<Entry term="AND · OR">
+<Fragment slot="code">
+
+```sql run
+SELECT * FROM celebs
+WHERE age > 20 AND name LIKE 'A%';
+
+SELECT * FROM celebs
+WHERE age < 25 OR age > 60;
+```
+
+</Fragment>
+
+Logical operators that **combine conditions**. `AND` = both, `OR` = at least one.
+
+</Entry>
+
+## CASE
+
+<Entry term="CASE WHEN … THEN … ELSE … END">
+<Fragment slot="code">
+
+```sql run
+SELECT name, age,
+  CASE
+    WHEN age > 60 THEN 'Senior'
+    WHEN age >= 30 THEN 'Adult'
+    ELSE 'Young adult'
+  END AS age_group
+FROM celebs;
+```
+
+</Fragment>
+
+Creates different outputs based on conditions, like **if / else**.
+
+- `END AS …` gives the new column a name.
+- Conditions are checked **top to bottom**. The first match wins.
+
+</Entry>
+
+<Entry term="CASE in WHERE (no ELSE)">
+<Fragment slot="code">
+
+```sql run
+SELECT id, date, home_team, away_team, hgoal, agoal
+FROM matches
+WHERE CASE
+  WHEN home_team = 'Bologna' AND hgoal > agoal THEN 'Bologna Win'
+  WHEN away_team = 'Bologna' AND agoal > hgoal THEN 'Bologna Win'
+END IS NOT NULL;
+```
+
+</Fragment>
+
+If a `CASE` has **no `ELSE`**, it returns `NULL` for everything else, so `IS NOT NULL` keeps only the winning games.
+
+</Entry>
+
+<Entry term="COUNT(CASE …): pivoting">
+<Fragment slot="code">
+
+```sql run
+SELECT
+  c.name AS country,
+  COUNT(CASE WHEN m.season = '2012/2013' THEN m.id END) AS matches_2012_2013,
+  COUNT(CASE WHEN m.season = '2013/2014' THEN m.id END) AS matches_2013_2014
+FROM country AS c
+LEFT JOIN matches AS m ON c.id = m.country_id
+GROUP BY c.name;
+```
+
+</Fragment>
+
+`CASE` inside an aggregate counts only the rows that match, which turns categories into **columns**.
+
+</Entry>

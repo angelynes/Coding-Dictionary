@@ -1,0 +1,67 @@
+---
+title: Python basics
+description: Printing, checking types, and the basic kinds of data in Python.
+sidebar:
+  label: Overview
+  order: 0
+flashcards:
+  - q: How do you print text in Python?
+    a: "`print('Hello!')`"
+  - q: How do you check what type a value is?
+    a: "`type(value)`, e.g. `type(3.5)` gives `<class 'float'>`"
+  - q: What is a float?
+    a: A number with decimals, e.g. `3.14`
+---
+
+import { Legend, Value, Concept, Entry } from '@components';
+
+<Legend />
+
+## Printing & checking types
+
+<Entry term="print()">
+<Fragment slot="code">
+
+```python
+print('Hello!')
+```
+
+</Fragment>
+
+Shows a value on the screen. Text goes inside quotes `'...'`.
+
+</Entry>
+
+<Entry term="type()">
+<Fragment slot="code">
+
+```python
+type('hi')    # str
+type(10)      # int
+type(3.5)     # float
+type([1, 2])  # list
+```
+
+</Fragment>
+
+Checks the <Concept>type</Concept> of a value.
+
+</Entry>
+
+## Types of data
+
+| Type | Example | Meaning |
+| --- | --- | --- |
+| <Concept>String</Concept> `str` | `'hello'` | Text, written in quotes |
+| <Concept>Integer</Concept> `int` | `42` | Whole number |
+| <Concept>Float</Concept> `float` | `3.14` | Number with decimals |
+| <Concept>Boolean</Concept> `bool` | `True` / `False` | Yes or no |
+| <Concept>List</Concept> `list` | `[1, 2, 3]` | Ordered collection you can change |
+
+Try it:
+
+```python run
+for value in ['hello', 42, 3.14, True, [1, 2, 3]]:
+    print(repr(value), '->', type(value))
+```
+

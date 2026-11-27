@@ -1,0 +1,107 @@
+---
+title: Lists
+description: Creating, adding, removing, sorting, joining and looping over lists.
+sidebar:
+  order: 5
+flashcards:
+  - q: How do you add an item to the end of a list?
+    a: "`storage.append(item)`"
+  - q: How do you turn `'a,b,c'` into a list?
+    a: "`'a,b,c'.split(',')` gives `['a', 'b', 'c']`"
+  - q: How do you join `['a', 'b']` into one string?
+    a: "`''.join(variable)` gives `'ab'`. The string before `.join` goes between items."
+  - q: How do you remove the last item of a list (and get it back)?
+    a: "`colours.pop()`"
+  - q: How do you find the position of `'blue'` in a list?
+    a: "`colours.index('blue')`"
+  - q: What is the difference between `remove()` and `pop()`?
+    a: "`remove('hey')` removes by value. `pop()` removes by position (the last one by default)."
+  - q: How do you add up all numbers in a list?
+    a: "`sum(variable)`"
+---
+
+import { Value, Concept, Entry } from '@components';
+
+A <Concept>list</Concept> is an ordered collection that can change, e.g. `['maths', 'english', 'science']`.
+
+## Making lists
+
+<Entry term="split()">
+<Fragment slot="code">
+
+```python
+'maths english'.split()       # ['maths', 'english']
+'a,b,c'.split(',')            # ['a', 'b', 'c']
+```
+
+</Fragment>
+
+Splits data to **make a list**. With no argument it splits on spaces.
+
+</Entry>
+
+<Entry term="list()">
+<Fragment slot="code">
+
+```python
+list('abc')   # ['a', 'b', 'c']
+```
+
+</Fragment>
+
+Another way to create a list.
+
+</Entry>
+
+## Changing lists
+
+| Code | What it does |
+| --- | --- |
+| `storage.append(variable)` | Add to the end |
+| `variable.remove('hey')` | Remove an item by value |
+| `colours.pop()` | Remove (and return) the last item |
+| `variable.reverse()` | Reverse the list order |
+| `variable.sort()` | Sort (A→Z or smallest→largest) |
+
+## Reading lists
+
+| Code | What it does |
+| --- | --- |
+| `variable[0]`, `variable[:5]` | Indexing and slicing (like strings) |
+| `colours.index('blue')` | Position of an item |
+| `'Smth' in variable` | Check if something exists: `True` / `False` |
+| `sum(variable)` | Sum of numbers |
+| `len(variable)` | Number of items |
+| `''.join(variable)` | Join items into one string |
+
+```python run
+colours = ['red', 'green']
+colours.append('blue')
+print(colours)
+print(colours.index('blue'))
+print('pink' in colours)
+
+last = colours.pop()
+print('popped', last, '->', colours)
+
+colours.sort()
+print(', '.join(colours))
+print(sum([3, 4, 5]))
+```
+
+## Looping over a list
+
+<Entry term="for item in list">
+<Fragment slot="code">
+
+```python
+subjects = ['maths', 'english', 'science']
+for subject in subjects:
+    print(subject)
+```
+
+</Fragment>
+
+Use `for` to read each item in the list and print it **one per line**.
+
+</Entry>

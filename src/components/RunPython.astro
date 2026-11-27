@@ -1,0 +1,95 @@
+---
+/**
+ * Editable, runnable Python box. Runs in the browser with Pyodide.
+ *
+ * <RunPython code={`print('Hello!')`} />
+ * <RunPython code={`...`} files={{ 'example.csv': 'name,age\nLisa,8' }} />
+ */
+import '../styles/runner.css';
+
+interface Props {
+	code: string;
+	/** Files to create before running (for file / CSV examples). */
+	files?: Record<string, string>;
+	title?: string;
+}
+const { code, files = {}, title = 'Python' } = Astro.props;
+const clean = code.replace(/^\n+|\s+$/g, '');
+---
+
+<run-python class="not-content" data-files={JSON.stringify(files)}>
+	<div class="rc-bar">
+		<span class="rc-lang">🐍 {title}</span>
+		<span class="rc-hint">editable · ⌘/Ctrl + Enter to run</span>
+		<button type="button" data-act="reset">Reset</button>
+		<button type="button" data-act="run" class="rc-run">▶ Run</button>
+	</div>
+	<textarea class="rc-editor" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Python code" data-original={clean}>{clean}</textarea>
+	<div class="rc-out" aria-live="polite" hidden></div>
+</run-python>
+
+<script>
+	import { enhanceEditor, loadScript, escapeHtml } from './editor';
+
+	const PYODIDE = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/';
+	let pyodideReady: Promise<any> | undefined;
+
+	function getPyodide() {
+		pyodideReady ??= loadScript(PYODIDE + 'pyodide.js').then(() =>
+			(window as any).loadPyodide({ indexURL: PYODIDE }),
+		);
+		pyodideReady.catch(() => (pyodideReady = undefined));
+		return pyodideReady;
+	}
+
+	class RunPython extends HTMLElement {
+		connectedCallback() {
+			const ta = this.querySelector('textarea')!;
+			const out = this.querySelector<HTMLElement>('.rc-out')!;
+			const runBtn = this.querySelector<HTMLButtonElement>('[data-act=run]')!;
+			const files: Record<string, string> = JSON.parse(this.dataset.files || '{}');
+
+			const run = async () => {
+				runBtn.disabled = true;
+				out.hidden = false;
+				out.innerHTML = '<span class="rc-muted">Loading Python… (first run takes a few seconds)</span>';
+				try {
+					const py = await getPyodide();
+					const lines: string[] = [];
+					py.setStdout({ batched: (s: string) => lines.push(escapeHtml(s)) });
+					py.setStderr({ batched: (s: string) => lines.push(`<span class="rc-err">${escapeHtml(s)}</span>`) });
+					py.setStdin({ stdin: () => window.prompt('input():') ?? '' });
+					for (const [name, content] of Object.entries(files)) py.FS.writeFile(name, content);
+					// Downloads packages like numpy the first time they are imported.
+					await py.loadPackagesFromImports(ta.value);
+					const ns = py.globals.get('dict')();
+					try {
+						const result = await py.runPythonAsync(ta.value, { globals: ns });
+						if (result !== undefined && lines.length === 0) lines.push(escapeHtml(String(result)));
+					} catch (err: any) {
+						const msg = String(err.message || err).trim().split('\n');
+						// Keep the useful end of the traceback.
+						const start = msg.findIndex((l) => l.includes('File "<exec>"'));
+						lines.push(`<span class="rc-err">${escapeHtml(msg.slice(start >= 0 ? start : -3).join('\n'))}</span>`);
+					} finally {
+						ns.destroy();
+					}
+					out.innerHTML = `<pre>${lines.join('\n') || '<span class="rc-ok">✓ Ran with no output</span>'}</pre>`;
+				} catch (err: any) {
+					out.innerHTML = `<span class="rc-err">${escapeHtml(err.message || String(err))}</span>`;
+				} finally {
+					runBtn.disabled = false;
+				}
+			};
+
+			const fit = enhanceEditor(ta, run);
+			runBtn.addEventListener('click', run);
+			this.querySelector('[data-act=reset]')!.addEventListener('click', () => {
+				ta.value = ta.dataset.original ?? '';
+				fit();
+				out.hidden = true;
+			});
+		}
+	}
+	customElements.define('run-python', RunPython);
+</script>

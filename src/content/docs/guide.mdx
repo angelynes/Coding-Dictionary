@@ -1,0 +1,88 @@
+---
+title: How to use this dictionary
+description: The colour legend, the building blocks, and how to add new notes after class.
+---
+
+import { Legend, Value, Concept, Keyword, Entry } from '@components';
+import { Steps, FileTree } from '@astrojs/starlight/components';
+
+## Colour legend
+
+<Legend />
+
+The colours are the same as in the original Google Docs:
+
+- <Value>Value</Value>: something **you** choose, like a table name, a variable or a number.
+- `CODE`: the code you type exactly as written.
+- <Concept>CONCEPT</Concept>: the word for an idea or definition.
+- <Keyword>keyword</Keyword>: a built-in Python keyword such as <Keyword>break</Keyword> or <Keyword>True</Keyword>.
+
+## Entries
+
+Each term is an **entry**: code on the left, explanation on the right.
+
+<Entry term="Example entry">
+<Fragment slot="code">
+
+```sql
+SELECT * FROM celebs;
+```
+
+</Fragment>
+
+<Concept>SELECT</Concept> picks columns. `*` means every column.
+
+</Entry>
+
+## Runnable code
+
+Add the word `run` after the language of any code block and it becomes an editable box with a **▶ Run** button (or press <kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>Enter</kbd>):
+
+````md
+```python run
+print('Hello!')
+```
+
+```sql run
+SELECT * FROM celebs;
+```
+````
+
+Without `run`, it stays a normal highlighted code block. Python runs with [Pyodide](https://pyodide.org) and SQL runs on SQLite with the [sample database](../sql/sample-database/), both inside your browser.
+
+```python run
+name = 'Angel'
+print('Hello,', name + '!')
+```
+
+```sql run
+SELECT name, age FROM celebs WHERE age > 30;
+```
+
+## Adding notes after class
+
+<Steps>
+
+1. Open a terminal in the project folder and run:
+
+   ```bash
+   npm run new -- python "List comprehensions"
+   ```
+
+   This creates `src/content/docs/python/list-comprehensions.mdx` from a template and adds it to the sidebar.
+
+2. Run `npm run dev` and open http://localhost:4321 to see your page update as you type.
+
+3. Fill in the entries and add flashcards in the `flashcards:` list at the top of the file.
+
+</Steps>
+
+<FileTree>
+- src/
+  - content/docs/
+    - python/ one file per topic
+    - sql/
+  - data/sample-db.sql the tables used by runnable SQL boxes
+  - components/ Entry, RunPython, RunSQL, Flashcards…
+- astro.config.mjs sidebar order
+</FileTree>

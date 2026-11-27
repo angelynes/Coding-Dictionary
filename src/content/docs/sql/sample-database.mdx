@@ -1,0 +1,40 @@
+---
+title: Sample database
+description: The practice tables every runnable SQL box uses.
+sidebar:
+  order: 1
+---
+
+
+Every **▶ Run** box on the SQL pages runs on a fresh copy of this SQLite database, so `UPDATE`, `DELETE` and `DROP` can't break anything. Press Run again to reset it.
+
+The tables are defined in `src/data/sample-db.sql`. Add new tables there when a lesson needs them.
+
+## All tables
+
+```sql run
+SELECT name AS table_name, type
+FROM sqlite_master
+WHERE type IN ('table', 'view')
+ORDER BY name;
+```
+
+## Peek at any table
+
+Change the table name and run:
+
+```sql run
+SELECT * FROM celebs;
+```
+
+| Table | Used for |
+| --- | --- |
+| `celebs` | Basics, filtering, DDL/DML |
+| `employees` (+ `employee`) | DISTINCT, window functions, views |
+| `films`, `reviews` | WHERE, aliases, quoted column names |
+| `products`, `order_items`, `sales` | Joins, window functions |
+| `countries`, `languages` | INNER JOIN … USING |
+| `branch_a_employees`, `branch_b_employees` | UNION |
+| `presidents`, `prime_ministers`, `monarchs` | INTERSECT, EXCEPT |
+| `country`, `matches` (+ `match`) | CASE, subqueries, CTEs |
+| `users` | COALESCE |

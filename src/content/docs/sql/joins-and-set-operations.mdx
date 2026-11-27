@@ -1,0 +1,163 @@
+---
+title: Joins & set operations
+description: INNER, LEFT, RIGHT, FULL and CROSS joins, plus UNION, INTERSECT and EXCEPT.
+sidebar:
+  order: 7
+flashcards:
+  - q: Joins combine tables ___. Set operations (UNION) combine them ___.
+    a: Horizontally (more columns side by side). Vertically (stacking rows on top of each other).
+  - q: What does LEFT JOIN return?
+    a: All rows from the left table, plus matching rows from the right. No match gives NULLs on the right side.
+  - q: What does INNER JOIN return?
+    a: Only rows that match in both tables.
+  - q: What does FULL (OUTER) JOIN return?
+    a: All rows from both tables, matched where possible (LEFT + RIGHT together).
+  - q: What does CROSS JOIN return?
+    a: The Cartesian product, so every row of table 1 is combined with every row of table 2.
+  - q: When can you write `USING(code)` instead of `ON a.code = b.code`?
+    a: When the joining column has the same name in both tables.
+  - q: What's the difference between UNION and UNION ALL?
+    a: UNION removes duplicate rows. UNION ALL keeps them all (and runs faster).
+  - q: What do INTERSECT and EXCEPT return?
+    a: "INTERSECT: rows in both queries. EXCEPT: rows in the left query that are not in the right one."
+---
+
+import { Concept, Value, Entry } from '@components';
+
+## When to use which technique
+
+- **Joins**: combine data from multiple tables. Essential for databases with more than one table.
+- **Correlated subqueries**: match data across columns, e.g. identifying supervisors.
+- **Multiple / nested subqueries**: complex queries that need multi-step transformations.
+- **CTEs**: organise and simplify complex queries. Ideal for comparing different data sets.
+
+## Joining data
+
+A <Concept>join</Concept> combines tables **horizontally**, adding more columns side by side.
+
+<Entry term="LEFT JOIN">
+<Fragment slot="code">
+
+```sql run
+SELECT
+  products.product_name,
+  SUM(order_items.quantity) AS total_units_sold
+FROM products
+LEFT JOIN order_items
+  ON products.product_id = order_items.product_id
+GROUP BY products.product_name;
+```
+
+</Fragment>
+
+Returns **all** rows from the left table, plus the matching rows from the right table. If there's no match, the right side is `NULL` (see Desk Lamp).
+
+`products.product_name` means <Value>table</Value>.<Value>column</Value>.
+
+</Entry>
+
+<Entry term="INNER JOIN … USING">
+<Fragment slot="code">
+
+```sql run
+SELECT c.name AS country,
+       l.name AS language,
+       official
+FROM countries AS c
+INNER JOIN languages AS l
+USING(code);
+```
+
+</Fragment>
+
+Returns only rows that **match in both** tables (Brazil and France disappear).
+
+`USING(code)` is a shortcut for `ON c.code = l.code` when the column has the **same name** in both tables.
+
+</Entry>
+
+<Entry term="RIGHT JOIN · FULL JOIN">
+<Fragment slot="code">
+
+```sql run
+SELECT p.product_name, o.order_id, o.product_id
+FROM products AS p
+FULL JOIN order_items AS o
+  ON p.product_id = o.product_id;
+```
+
+</Fragment>
+
+- `RIGHT JOIN`: all rows from the **right** table, plus matching rows from the left.
+- `FULL (OUTER) JOIN`: all rows from **both** tables, i.e. LEFT and RIGHT together.
+
+</Entry>
+
+<Entry term="CROSS JOIN">
+<Fragment slot="code">
+
+```sql run
+SELECT p.product_name, c.name
+FROM products AS p
+CROSS JOIN countries AS c;
+```
+
+</Fragment>
+
+Returns the <Concept>Cartesian product</Concept>: **every** row of table 1 combined with **every** row of table 2 (5 × 5 = 25 rows).
+
+</Entry>
+
+## Set operations
+
+Set operations combine query results **vertically**, stacking rows on top of each other. Both queries need the same number of columns.
+
+<Entry term="UNION · UNION ALL">
+<Fragment slot="code">
+
+```sql run
+SELECT email FROM branch_a_employees
+UNION
+SELECT email FROM branch_b_employees;
+```
+
+</Fragment>
+
+- `UNION`: removes duplicate rows between the sets
+- `UNION ALL`: keeps all duplicates (runs faster than UNION)
+
+Change it to `UNION ALL` and see priya appear twice.
+
+</Entry>
+
+<Entry term="INTERSECT">
+<Fragment slot="code">
+
+```sql run
+SELECT country FROM prime_ministers
+INTERSECT
+SELECT country FROM presidents;
+```
+
+</Fragment>
+
+Returns only records found in **both** results. The columns must match, and duplicates aren't returned.
+
+</Entry>
+
+<Entry term="EXCEPT">
+<Fragment slot="code">
+
+```sql run
+SELECT monarch, country
+FROM monarchs
+EXCEPT
+SELECT prime_minister, country
+FROM prime_ministers;
+```
+
+</Fragment>
+
+Keeps records from the **left** query that are **not** found in the right query.
+
+</Entry>
