@@ -57,9 +57,14 @@ const hasCode = Astro.slots.has('code');
 </script>
 
 <style>
+	/* Reset Starlight's own styling for <details> so the row stays clean. */
 	.cd-entry {
+		border: 0;
 		border-bottom: 1px solid var(--cd-rule);
+		border-radius: 0;
+		padding: 0;
 		margin: 0;
+		background: transparent;
 	}
 	/* The first entry after a heading or paragraph gets the strong top rule. */
 	:global(:not(.cd-entry)) + .cd-entry {
@@ -73,11 +78,22 @@ const hasCode = Astro.slots.has('code');
 		align-items: center;
 		min-height: 3.1rem;
 		padding: 0.4rem 0.6rem;
+		margin: 0;
+		font-weight: 400;
 		cursor: pointer;
 		list-style: none;
 	}
-	.cd-row::-webkit-details-marker {
+	.cd-row::-webkit-details-marker,
+	.cd-row::marker {
 		display: none;
+	}
+	.cd-row::before,
+	.cd-row::after {
+		display: none !important;
+		content: none !important;
+	}
+	.cd-entry[open] > .cd-row {
+		margin: 0;
 	}
 	.cd-row:hover {
 		background: var(--cd-hover);

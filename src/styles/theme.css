@@ -98,9 +98,12 @@ site-search > button {
 }
 
 /* Sidebar: plain list, current topic in rust */
-.sidebar-content a {
+.sidebar-content a,
+.sidebar-content a.large {
 	font-size: var(--sl-text-base);
+	font-weight: 400;
 	color: var(--sl-color-gray-2);
+	padding-block: 0.3rem;
 }
 .sidebar-content a:hover {
 	color: var(--sl-color-white);
@@ -185,11 +188,15 @@ h1#_top {
 
 /* ---------- Home page ---------- */
 .hero {
+	grid-template-columns: 1fr !important;
+	justify-items: center;
 	padding-block: 2.5rem 0;
 	text-align: center;
 }
-.hero > .stack {
+.hero > .stack,
+.hero .copy {
 	align-items: center;
+	text-align: center;
 }
 .hero h1 {
 	font-size: clamp(2.6rem, 6vw, 4.5rem);

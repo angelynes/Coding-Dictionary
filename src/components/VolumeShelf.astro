@@ -34,8 +34,9 @@ const topicCount = (id: string) => docs.filter((d) => d.id === id || d.id.starts
 <style>
 	.cd-shelf {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
-		gap: 1.5rem;
+		grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
+		justify-content: center;
+		gap: 1.75rem;
 		margin-top: 2rem;
 	}
 	.cd-book {
