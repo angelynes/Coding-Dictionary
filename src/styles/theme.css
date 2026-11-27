@@ -1,64 +1,132 @@
 /* ------------------------------------------------------------------
-   Coding Dictionary theme
-   Based on the original Google Docs: lavender section headers and the
-   colour legend  Value (blue) | CODE (ink) | CONCEPT (red).
+   Coding Dictionary theme: warm paper, Lora, rust accent.
+   Light = paper. Dark = warm espresso.
+   Starlight colour scale: --sl-color-white is the strongest text colour,
+   --sl-color-black is the page background, gray-1…gray-7 sit in between.
 ------------------------------------------------------------------- */
 
-/* Dark mode (Starlight default) */
 :root {
-	--sl-color-accent-low: #2a2140;
-	--sl-color-accent: #9d84e0;
-	--sl-color-accent-high: #ddd2fa;
-
-	--cd-value: #7fb2ff;
-	--cd-concept: #ff7a7a;
-	--cd-keyword: #ffab5e;
-	--cd-header-bg: #3a2f57;
-	--cd-header-fg: #efe9fb;
-	--cd-card-bg: #1c1a24;
-	--cd-card-border: #3a3550;
-	--cd-term-bg: #2a2140;
-	--cd-output-bg: #14131a;
-	--cd-ok: #6fd39a;
-	--cd-err: #ff8a8a;
+	--sl-font: 'Lora', Georgia, 'Times New Roman', serif;
+	--sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+	--sl-content-width: 54rem;
+	--sl-sidebar-width: 17rem;
 }
 
-/* Light mode */
+/* Dark mode: warm espresso (Starlight's default block is dark) */
+:root {
+	--sl-color-white: #ede7dc;
+	--sl-color-gray-1: #d9d1c4;
+	--sl-color-gray-2: #cfc6b8;
+	--sl-color-gray-3: #a99f91;
+	--sl-color-gray-4: #7d746a;
+	--sl-color-gray-5: #38322b;
+	--sl-color-gray-6: #2a2520;
+	--sl-color-gray-7: #221e1a;
+	--sl-color-black: #1c1916;
+
+	--sl-color-accent-low: #3a2219;
+	--sl-color-accent: #e48d6b;
+	--sl-color-accent-high: #f2b39a;
+
+	--cd-rule: #38322b;
+	--cd-hover: #241f1b;
+	--cd-open-bg: #221e1a;
+	--cd-code-bg: #2a2520;
+	--cd-spine: #b4532f;
+
+	--cd-value: #93b6ea;
+	--cd-concept: #e48d6b;
+	--cd-keyword: #e0b35c;
+	--cd-card-bg: #221e1a;
+	--cd-card-border: #38322b;
+	--cd-term-bg: #2a2520;
+	--cd-output-bg: #1f1b18;
+	--cd-ok: #8fcf9f;
+	--cd-err: #f2a08a;
+}
+
+/* Light mode: warm paper */
 :root[data-theme='light'] {
-	--sl-color-accent-low: #ece6fa;
-	--sl-color-accent: #6a4bbd;
-	--sl-color-accent-high: #2e1f5c;
+	--sl-color-white: #24211d;
+	--sl-color-gray-1: #3a3631;
+	--sl-color-gray-2: #4a463f;
+	--sl-color-gray-3: #6f6a61;
+	--sl-color-gray-4: #8f897e;
+	--sl-color-gray-5: #dcd8cf;
+	--sl-color-gray-6: #ebe8e1;
+	--sl-color-gray-7: #f1eee8;
+	--sl-color-black: #f6f4ef;
 
-	--cd-value: #1a5fd0;
-	--cd-concept: #d32f2f;
-	--cd-keyword: #d9700b;
-	--cd-header-bg: #e3dcf5;
-	--cd-header-fg: #241a40;
-	--cd-card-bg: #ffffff;
-	--cd-card-border: #d9d3ea;
-	--cd-term-bg: #f3effc;
-	--cd-output-bg: #f7f6fb;
-	--cd-ok: #1d7a46;
-	--cd-err: #c62828;
+	--sl-color-accent-low: #f1e1d8;
+	--sl-color-accent: #9a3c22;
+	--sl-color-accent-high: #6e2a17;
+
+	--cd-rule: #dcd8cf;
+	--cd-hover: #efece5;
+	--cd-open-bg: #fbfaf7;
+	--cd-code-bg: #ebe8e1;
+	--cd-spine: #9a3c22;
+
+	--cd-value: #2f5d9e;
+	--cd-concept: #9a3c22;
+	--cd-keyword: #a35a0c;
+	--cd-card-bg: #fffefb;
+	--cd-card-border: #d6d1c6;
+	--cd-term-bg: #ebe8e1;
+	--cd-output-bg: #fbfaf7;
+	--cd-ok: #1d6b3f;
+	--cd-err: #b3261e;
 }
 
-/* Section headers look like the lavender highlight in the docs */
-.sl-markdown-content h2 {
-	display: inline-block;
-	background: var(--cd-header-bg);
-	color: var(--cd-header-fg);
-	padding: 0.15em 0.5em;
-	border-radius: 0.35em;
+/* ---------- Page chrome ---------- */
+body {
+	background: var(--sl-color-black);
+}
+.site-title {
+	font-family: var(--sl-font);
+	font-weight: 500;
 	font-size: var(--sl-text-xl);
+	color: var(--sl-color-white);
 }
-.sl-markdown-content .sl-heading-wrapper.level-h2 {
-	display: flex;
-	align-items: center;
-	gap: 0.4rem;
+
+/* Search button in the header: a soft pill */
+site-search > button {
+	border-radius: 999px;
+	background: var(--sl-color-gray-6);
+	border-color: transparent;
+	font-style: italic;
 }
-.sl-markdown-content .sl-heading-wrapper.level-h2 .sl-anchor-link {
-	position: static;
-	margin: 0;
+
+/* Sidebar: plain list, current topic in rust */
+.sidebar-content a {
+	font-size: var(--sl-text-base);
+	color: var(--sl-color-gray-2);
+}
+.sidebar-content a:hover {
+	color: var(--sl-color-white);
+}
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:hover,
+.sidebar-content a[aria-current='page']:focus {
+	background: transparent;
+	color: var(--sl-color-accent);
+	font-weight: 600;
+}
+
+/* ---------- Page content ---------- */
+.sl-markdown-content h1,
+h1#_top {
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+.sl-markdown-content h2 {
+	font-weight: 500;
+	font-size: var(--sl-text-2xl);
+	color: var(--sl-color-white);
+	margin-top: 2.5rem;
+}
+.sl-markdown-content h3 {
+	font-weight: 600;
 }
 
 /* Inline legend colours */
@@ -72,13 +140,34 @@
 }
 .cd-keyword {
 	color: var(--cd-keyword);
-	font-family: var(--__sl-font-mono);
+	font-family: var(--sl-font-mono);
 	font-size: 0.92em;
 }
 
-/* Tables: a bit tighter, so they read like the symbol tables in the docs */
+/* Inline code: soft paper chip */
+.sl-markdown-content :not(pre) > code {
+	background: var(--cd-code-bg);
+	border: 0;
+	border-radius: 0.25rem;
+	padding: 0.05em 0.35em;
+}
+
+/* Tables: ruled like the dictionary rows */
+.sl-markdown-content table {
+	font-size: var(--sl-text-base);
+}
 .sl-markdown-content table code {
 	white-space: nowrap;
+}
+.sl-markdown-content th {
+	border-bottom: 2px solid var(--sl-color-white);
+	font-variant: small-caps;
+	letter-spacing: 0.06em;
+	font-weight: 500;
+	color: var(--sl-color-gray-3);
+}
+.sl-markdown-content td {
+	border-bottom: 1px solid var(--cd-rule);
 }
 
 /* Note callouts (the "*" notes in the docs) */
@@ -87,7 +176,36 @@
 	font-size: var(--sl-text-sm);
 }
 
-/* A little wider than Starlight's default, so code + explanation fit side by side */
-:root {
-	--sl-content-width: 52rem;
+/* Small caps label used for "Vol. II" etc. */
+.cd-smallcaps {
+	font-variant: small-caps;
+	letter-spacing: 0.1em;
+	color: var(--sl-color-gray-3);
+}
+
+/* ---------- Home page ---------- */
+.hero {
+	padding-block: 2.5rem 0;
+	text-align: center;
+}
+.hero > .stack {
+	align-items: center;
+}
+.hero h1 {
+	font-size: clamp(2.6rem, 6vw, 4.5rem);
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--sl-color-white);
+}
+.hero .tagline {
+	font-style: italic;
+	font-size: var(--sl-text-2xl);
+	color: var(--sl-color-gray-2);
+}
+.cd-home-links {
+	margin-top: 2.5rem !important;
+	padding-top: 1.2rem;
+	border-top: 1px solid var(--cd-rule);
+	text-align: center;
+	color: var(--sl-color-gray-3);
 }

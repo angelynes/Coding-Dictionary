@@ -43,7 +43,7 @@ import { Value, Concept, Keyword, Entry } from '@components';
 
 ## First section
 
-<Entry term="name_of_thing()">
+<Entry term="name_of_thing()" short="Very short meaning (under ~40 characters)">
 <Fragment slot="code">
 
 ${fence}${lang}
@@ -52,7 +52,7 @@ ${fence}
 
 </Fragment>
 
-What it does. Mark a <Concept>concept</Concept>, a <Value>value</Value> or a <Keyword>keyword</Keyword>.
+The full explanation, shown when the entry is opened. Mark a <Concept>concept</Concept>, a <Value>value</Value> or a <Keyword>keyword</Keyword>.
 
 </Entry>
 
@@ -66,6 +66,6 @@ ${fence}
 console.log(`Created ${file}`);
 if (!['python', 'sql'].includes(folder)) {
 	console.log(
-		`New topic! Add this line to the sidebar in astro.config.mjs:\n  { label: '${topic}', items: [{ autogenerate: { directory: '${folder}' } }] },`,
+		`New dictionary! Also:\n  1. Add it to src/volumes.ts: { id: '${folder}', name: '${topic}', description: '…' },\n  2. Add its sidebar group in astro.config.mjs (label must match the name):\n     { label: '${topic}', items: [{ autogenerate: { directory: '${folder}' } }] },`,
 	);
 }

@@ -1,18 +1,24 @@
 ---
 /**
- * One dictionary entry: the term, the code on the left and the
- * explanation on the right (like the tables in the original docs).
+ * One dictionary entry, shown as a compact row: the term and a short meaning.
+ * Click (or tap) the row to open the full explanation and the code.
  *
- * <Entry term="LEFT JOIN">
+ * <Entry term="LEFT JOIN" short="All left rows + their matches">
  *   <Fragment slot="code"> ```sql ... ``` </Fragment>
- *   Explanation in Markdown...
+ *   Full explanation in Markdown...
  * </Entry>
+ *
+ * Keep `short` under ~40 characters so lookups stay quick.
  */
 interface Props {
 	term: string;
+	/** A very short meaning shown before the entry is opened. */
+	short?: string;
 	id?: string;
+	/** Start opened. */
+	open?: boolean;
 }
-const { term, id } = Astro.props;
+const { term, short, id, open = false } = Astro.props;
 const slug =
 	id ??
 	term
@@ -22,63 +28,129 @@ const slug =
 const hasCode = Astro.slots.has('code');
 ---
 
-<section class:list={['cd-entry', { 'cd-entry--split': hasCode }]}>
-	<h3 id={slug} class="cd-term not-content">{term}</h3>
-	<div class="cd-grid">
-		{hasCode && <div class="cd-code"><slot name="code" /></div>}
+<details class="cd-entry" open={open}>
+	<summary class="cd-row not-content">
+		<h3 class="cd-term" id={slug}>{term}</h3>
+		{short && <span class="cd-short">{short}</span>}
+		<svg class="cd-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+	</summary>
+	<div class="cd-body">
 		<div class="cd-explain"><slot /></div>
+		{hasCode && <div class="cd-code"><slot name="code" /></div>}
 	</div>
-</section>
+</details>
+
+<script>
+	// Open an entry when the page is visited with its #link (e.g. from search).
+	function openFromHash() {
+		const id = decodeURIComponent(location.hash.slice(1));
+		if (!id) return;
+		const el = document.getElementById(id);
+		const details = el?.closest('details.cd-entry');
+		if (details instanceof HTMLDetailsElement) {
+			details.open = true;
+			el.scrollIntoView({ block: 'start' });
+		}
+	}
+	openFromHash();
+	window.addEventListener('hashchange', openFromHash);
+</script>
 
 <style>
 	.cd-entry {
-		border: 1px solid var(--cd-card-border);
-		border-radius: 0.6rem;
-		background: var(--cd-card-bg);
-		overflow: hidden;
+		border-bottom: 1px solid var(--cd-rule);
+		margin: 0;
+	}
+	/* The first entry after a heading or paragraph gets the strong top rule. */
+	:global(:not(.cd-entry)) + .cd-entry {
+		border-top: 2px solid var(--sl-color-white);
 		margin-top: 1rem;
 	}
-	.cd-term {
-		margin: 0 !important;
-		padding: 0.45rem 0.9rem;
-		background: var(--cd-term-bg);
-		border-bottom: 1px solid var(--cd-card-border);
-		font-family: var(--__sl-font-mono);
-		font-size: var(--sl-text-base) !important;
-		color: var(--sl-color-accent-high) !important;
-	}
-	.cd-grid {
+	.cd-row {
 		display: grid;
+		grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 1.25rem;
+		gap: 1rem;
+		align-items: center;
+		min-height: 3.1rem;
+		padding: 0.4rem 0.6rem;
+		cursor: pointer;
+		list-style: none;
+	}
+	.cd-row::-webkit-details-marker {
+		display: none;
+	}
+	.cd-row:hover {
+		background: var(--cd-hover);
+	}
+	.cd-row:focus-visible {
+		outline: 2px solid var(--sl-color-accent);
+		outline-offset: -2px;
+	}
+	.cd-term {
+		margin: 0;
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-base);
+		font-weight: 500;
+		line-height: 1.35;
+		color: var(--sl-color-white);
+		overflow-wrap: anywhere;
+	}
+	.cd-short {
+		font-size: var(--sl-text-lg);
+		line-height: 1.35;
+		color: var(--sl-color-gray-1);
+	}
+	.cd-chevron {
+		color: var(--sl-color-gray-3);
+		transition: transform 0.15s ease;
+	}
+	.cd-entry[open] {
+		background: var(--cd-open-bg);
+	}
+	.cd-entry[open] .cd-term {
+		color: var(--sl-color-accent-high);
+	}
+	.cd-entry[open] .cd-chevron {
+		transform: rotate(180deg);
+	}
+	.cd-body {
+		display: flex;
+		flex-direction: column;
 		gap: 0.9rem;
-		padding: 0.9rem;
+		padding: 0.2rem 0.6rem 1.2rem calc(15rem + 1.6rem);
 	}
-	.cd-entry--split .cd-grid {
-		grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-	}
-	@media (max-width: 50rem) {
-		.cd-entry--split .cd-grid {
-			grid-template-columns: minmax(0, 1fr);
-		}
-	}
-	/* Runnable boxes need the full width: explanation first, then the box. */
-	.cd-entry--split .cd-grid:has(run-sql, run-python) {
-		grid-template-columns: minmax(0, 1fr);
-	}
-	.cd-grid:has(run-sql, run-python) .cd-explain {
-		order: -1;
-	}
-	.cd-code :global(run-sql),
-	.cd-code :global(run-python) {
-		margin-top: 0;
-	}
-	.cd-code > :global(*:first-child),
-	.cd-explain > :global(*:first-child) {
+	.cd-body > :global(*),
+	.cd-explain > :global(*:first-child),
+	.cd-code > :global(*:first-child) {
 		margin-top: 0;
 	}
 	.cd-explain {
-		font-size: var(--sl-text-sm);
+		font-size: var(--sl-text-base);
+		line-height: 1.6;
 	}
 	.cd-explain :global(ul) {
 		padding-inline-start: 1.1rem;
+	}
+
+	@media (max-width: 50rem) {
+		.cd-row {
+			grid-template-columns: minmax(0, 1fr) 1.25rem;
+			gap: 0.15rem 0.75rem;
+			padding: 0.6rem 0.3rem;
+		}
+		.cd-term {
+			grid-column: 1;
+		}
+		.cd-short {
+			grid-column: 1;
+			font-size: var(--sl-text-base);
+		}
+		.cd-chevron {
+			grid-column: 2;
+			grid-row: 1 / span 2;
+		}
+		.cd-body {
+			padding: 0.2rem 0.3rem 1rem;
+		}
 	}
 </style>
