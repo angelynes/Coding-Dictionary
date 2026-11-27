@@ -492,6 +492,10 @@ const file = volume && filePath ? filePath.replace(/^\.\//, '') : '';
 
 	/* The form window */
 	.cd-dialog {
+		position: fixed;
+		inset: 0;
+		margin: auto;
+		height: fit-content;
 		width: min(44rem, calc(100vw - 2rem));
 		max-height: calc(100dvh - 2rem);
 		padding: 0;
@@ -559,11 +563,12 @@ const file = volume && filePath ? filePath.replace(/^\.\//, '') : '';
 	.cd-form-body textarea {
 		resize: vertical;
 	}
-	.cd-form-body .cd-mono {
+	.cd-form-body input.cd-mono,
+	.cd-form-body textarea.cd-mono {
 		font-family: var(--sl-font-mono);
 		font-size: var(--sl-text-sm);
 	}
-	.cd-form-body .cd-code {
+	.cd-form-body textarea.cd-code {
 		background: var(--cd-code-bg);
 		border-color: transparent;
 		line-height: 1.6;
