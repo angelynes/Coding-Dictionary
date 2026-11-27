@@ -1,0 +1,12 @@
+[
+	{
+		"id": "python",
+		"name": "Python",
+		"description": "Strings, lists, dictionaries, loops, functions, files…"
+	},
+	{
+		"id": "sql",
+		"name": "SQL",
+		"description": "Filtering, joins, window functions, CTEs…"
+	}
+]

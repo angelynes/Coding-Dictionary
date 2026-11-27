@@ -1,14 +1,18 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { readFileSync } from 'node:fs';
 import remarkRunnable from './src/plugins/remark-runnable.mjs';
 
+// The dictionaries (Python, SQL, …). Each gets its own sidebar group.
+const volumes = JSON.parse(readFileSync('./src/volumes.json', 'utf8'));
+
 // Vercel sets VERCEL=1 while building. There the site lives at the root of
-// coding-dictionary-coral.vercel.app; on GitHub Pages it lives under /Coding-Dictionary.
+// the-coding-dictionary.vercel.app; on GitHub Pages it lives under /Coding-Dictionary.
 const onVercel = !!process.env.VERCEL;
 
 export default defineConfig({
-	site: onVercel ? 'https://coding-dictionary-coral.vercel.app' : 'https://angelynes.github.io',
+	site: onVercel ? 'https://the-coding-dictionary.vercel.app' : 'https://angelynes.github.io',
 	base: onVercel ? '/' : '/Coding-Dictionary',
 	// ```sql run / ```python run code blocks become runnable boxes
 	markdown: { remarkPlugins: [remarkRunnable] },
@@ -52,13 +56,14 @@ export default defineConfig({
 			components: {
 				// Dictionary name and switch on top, colour key at the bottom.
 				Sidebar: './src/components/overrides/Sidebar.astro',
+				// Editing tools (signed in on the live site only).
+				Footer: './src/components/overrides/Footer.astro',
 			},
 			sidebar: [
 				{ label: 'Start here', items: [{ label: 'How to use this', slug: 'guide' }] },
-				// Pages are added automatically from each folder.
+				// One group per dictionary, pages added automatically from its folder.
 				// Order them with `sidebar: { order: N }` in a page's frontmatter.
-				{ label: 'Python', items: [{ autogenerate: { directory: 'python' } }] },
-				{ label: 'SQL', items: [{ autogenerate: { directory: 'sql' } }] },
+				...volumes.map((v) => ({ label: v.name, items: [{ autogenerate: { directory: v.id } }] })),
 			],
 		}),
 	],
