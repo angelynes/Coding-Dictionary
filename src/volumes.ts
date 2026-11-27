@@ -1,8 +1,10 @@
+import data from './volumes.json';
+
 /**
  * The dictionaries ("volumes") on the home page.
- * Each one matches a folder in src/content/docs/ and a group in the sidebar.
- * To add a language: add it here, add its sidebar group in astro.config.mjs,
- * and create its folder with an index.mdx.
+ * The list lives in volumes.json; each one matches a folder in src/content/docs/
+ * and gets its own sidebar group automatically (see astro.config.mjs).
+ * Adding a language on the live site writes to volumes.json for you.
  */
 export interface Volume {
 	/** Folder name in src/content/docs/ */
@@ -15,18 +17,7 @@ export interface Volume {
 	spine?: string;
 }
 
-export const volumes: Volume[] = [
-	{
-		id: 'python',
-		name: 'Python',
-		description: 'Strings, lists, dictionaries, loops, functions, files…',
-	},
-	{
-		id: 'sql',
-		name: 'SQL',
-		description: 'Filtering, joins, window functions, CTEs…',
-	},
-];
+export const volumes: Volume[] = data;
 
 const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
 export const volumeNumber = (index: number) => numerals[index] ?? String(index + 1);

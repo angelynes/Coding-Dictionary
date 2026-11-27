@@ -1,0 +1,727 @@
+---
+/**
+ * Editing on the live site.
+ * Hidden for visitors. When you're signed in (on Vercel), it adds:
+ *   - a bar with "+ New term" and "Sign out"
+ *   - "+ New term" at the top of a topic and a pencil on every term
+ *   - "+ New topic" in the sidebar, "+ Add a language" on the home page
+ * Saving commits to GitHub; the site rebuilds in about a minute.
+ */
+import { findVolume } from '../volumes';
+
+const route = Astro.locals.starlightRoute;
+const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
+const volume = findVolume(route.id.split('/')[0]);
+const filePath = (route.entry as { filePath?: string }).filePath;
+const file = volume && filePath ? filePath.replace(/^\.\//, '') : '';
+---
+
+<cd-edit data-base={base} data-file={file} data-volume={volume?.id ?? ''}>
+	<a class="cd-signin" hidden>Sign in to edit</a>
+</cd-edit>
+
+<script>
+	type Topic = { title: string; file: string; sections: string[] };
+	type Vol = { id: string; name: string; topics: Topic[] };
+	type Fields = {
+		term: string;
+		short: string;
+		explanation: string;
+		code: string;
+		lang: string;
+		run: boolean;
+		codeIsRaw?: boolean;
+		sections?: string[];
+	};
+
+	const esc = (s: unknown) =>
+		String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+	const SPINES = ['#9a3c22', '#3f5e3a', '#2e4a6e', '#a8741a'];
+
+	class EditTools extends HTMLElement {
+		base = '/';
+		file = '';
+		volume = '';
+		dialog!: HTMLDialogElement;
+		topics?: Vol[];
+
+		async connectedCallback() {
+			this.base = this.dataset.base || '/';
+			this.file = this.dataset.file || '';
+			this.volume = this.dataset.volume || '';
+			let res: Response;
+			try {
+				res = await fetch(`${this.base}api/me`, { credentials: 'same-origin' });
+			} catch {
+				return;
+			}
+			// No API here (e.g. the GitHub Pages copy): stay hidden.
+			if (!(res.headers.get('content-type') || '').includes('application/json')) return;
+			const me = await res.json();
+			if (!me.signedIn) {
+				const link = this.querySelector<HTMLAnchorElement>('.cd-signin')!;
+				link.href = `${this.base}api/auth/login?back=${encodeURIComponent(location.pathname)}`;
+				link.hidden = false;
+				return;
+			}
+			this.setup(me.login);
+		}
+
+		setup(login: string) {
+			document.body.classList.add('cd-editing');
+			this.dialog = document.createElement('dialog');
+			this.dialog.className = 'cd-dialog';
+			document.body.append(this.dialog);
+
+			// Floating bar
+			const bar = document.createElement('div');
+			bar.className = 'cd-editbar';
+			bar.innerHTML = `
+				<button type="button" class="cd-btn cd-btn-primary" data-act="term">+ New term</button>
+				<span class="cd-editbar-who">Editing as <strong>${esc(login)}</strong></span>
+				<button type="button" class="cd-btn-link" data-act="signout">Sign out</button>`;
+			bar.addEventListener('click', async (e) => {
+				const act = (e.target as HTMLElement).closest('button')?.dataset.act;
+				if (act === 'term') this.termForm();
+				if (act === 'signout') {
+					await fetch(`${this.base}api/auth/logout`, { method: 'POST' });
+					location.reload();
+				}
+			});
+			document.body.append(bar);
+
+			// On a topic page: "+ New term" at the top, a pencil on every term.
+			const content = document.querySelector('.sl-markdown-content');
+			if (this.file && content) {
+				const add = document.createElement('button');
+				add.type = 'button';
+				add.className = 'cd-btn cd-add-term';
+				add.textContent = '+ New term on this page';
+				add.addEventListener('click', () => this.termForm());
+				content.prepend(add);
+				document.querySelectorAll<HTMLDetailsElement>('details.cd-entry[data-term]').forEach((d) => {
+					const pencil = document.createElement('button');
+					pencil.type = 'button';
+					pencil.className = 'cd-pencil';
+					pencil.setAttribute('aria-label', `Edit ${d.dataset.term}`);
+					pencil.innerHTML =
+						'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>';
+					pencil.addEventListener('click', (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						this.termForm(d.dataset.term);
+					});
+					d.querySelector('summary')?.insertBefore(pencil, d.querySelector('.cd-chevron'));
+				});
+			}
+
+			// In a dictionary: "+ New topic" in the sidebar.
+			const key = document.querySelector('.cd-key');
+			if (this.volume && key) {
+				const add = document.createElement('button');
+				add.type = 'button';
+				add.className = 'cd-btn-link cd-add-topic';
+				add.textContent = '+ New topic';
+				add.addEventListener('click', () => this.topicForm());
+				key.before(add);
+			}
+
+			// Home page: "+ Add a language".
+			const shelf = document.querySelector('.cd-shelf');
+			if (shelf) {
+				const add = document.createElement('button');
+				add.type = 'button';
+				add.className = 'cd-add-volume';
+				add.textContent = '+ Add a language';
+				add.addEventListener('click', () => this.volumeForm());
+				shelf.append(add);
+			}
+		}
+
+		async loadTopics() {
+			if (!this.topics) this.topics = await fetch(`${this.base}topics.json`).then((r) => r.json());
+			return this.topics!;
+		}
+
+		open(title: string, body: string, onSubmit: (form: HTMLFormElement) => Promise<void>) {
+			this.dialog.innerHTML = `
+				<form method="dialog" class="cd-form">
+					<header class="cd-form-head">
+						<h2>${esc(title)}</h2>
+						<button type="button" class="cd-close" aria-label="Close">✕</button>
+					</header>
+					<div class="cd-form-body">${body}</div>
+					<footer class="cd-form-foot">
+						<p class="cd-status" role="status"></p>
+						<button type="submit" class="cd-btn cd-btn-primary">Save</button>
+					</footer>
+				</form>`;
+			const form = this.dialog.querySelector('form')!;
+			form.querySelector('.cd-close')!.addEventListener('click', () => this.dialog.close());
+			form.addEventListener('submit', async (e) => {
+				e.preventDefault();
+				const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+				const status = form.querySelector('.cd-status')!;
+				button.disabled = true;
+				status.className = 'cd-status';
+				status.textContent = 'Saving…';
+				try {
+					await onSubmit(form);
+				} catch (err) {
+					status.className = 'cd-status cd-error';
+					status.textContent = (err as Error).message;
+					button.disabled = false;
+				}
+			});
+			this.dialog.showModal();
+			form.querySelector<HTMLElement>('input:not([type=hidden]), textarea')?.focus();
+			return form;
+		}
+
+		async save(form: HTMLFormElement, payload: object) {
+			const res = await fetch(`${this.base}api/save`, {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+			const data = await res.json().catch(() => ({ error: 'Something went wrong.' }));
+			if (!res.ok || !data.ok) throw new Error(data.error || 'Could not save.');
+			const status = form.querySelector('.cd-status')!;
+			status.className = 'cd-status cd-ok';
+			status.innerHTML = data.unchanged
+				? 'Nothing changed.'
+				: `Saved to GitHub. <strong>Going live in about a minute…</strong> ${
+						data.commit ? `<a href="${esc(data.commit)}" target="_blank" rel="noopener">See change</a>` : ''
+					}`;
+			const button = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+			button.textContent = 'Done';
+			button.disabled = false;
+			button.type = 'button';
+			button.onclick = () => this.dialog.close();
+		}
+
+		langFor(volume: string) {
+			return volume === 'sql' ? 'sql' : volume === 'python' ? 'python' : 'text';
+		}
+
+		async termForm(editTerm?: string) {
+			const editing = !!editTerm;
+			let fields: Fields = { term: '', short: '', explanation: '', code: '', lang: this.langFor(this.volume), run: false };
+			let where = '';
+			if (editing) {
+				this.open('Loading…', '<p>Loading the term…</p>', async () => {});
+				const res = await fetch(
+					`${this.base}api/entry?file=${encodeURIComponent(this.file)}&term=${encodeURIComponent(editTerm!)}`,
+				);
+				const data = await res.json();
+				if (!res.ok) {
+					this.dialog.querySelector('.cd-form-body')!.innerHTML = `<p class="cd-error">${esc(data.error)}</p>`;
+					return;
+				}
+				fields = data;
+			} else {
+				const vols = await this.loadTopics();
+				const options = vols
+					.map(
+						(v) =>
+							`<optgroup label="${esc(v.name)}">${v.topics
+								.map(
+									(t) =>
+										`<option value="${esc(t.file)}" data-volume="${esc(v.id)}" ${t.file === this.file ? 'selected' : ''}>${esc(t.title)}</option>`,
+								)
+								.join('')}</optgroup>`,
+					)
+					.join('');
+				where = `
+					<div class="cd-row2">
+						<label>Topic<select name="file" required>${this.file ? '' : '<option value="">Choose a topic…</option>'}${options}</select></label>
+						<label>Section<select name="section"></select></label>
+					</div>`;
+			}
+			const runnable = (lang: string) => lang === 'sql' || lang === 'python';
+			const body = `
+				${where}
+				<div class="cd-row2">
+					<label>Term<input name="term" class="cd-mono" required value="${esc(fields.term)}" autocomplete="off"></label>
+					<label><span class="cd-label-row">Short meaning <span class="cd-count"></span></span>
+						<input name="short" maxlength="40" value="${esc(fields.short)}" placeholder="e.g. All left rows + their matches" autocomplete="off"></label>
+				</div>
+				<label>Full explanation <span class="cd-hint">shown when the term is opened · Markdown, \`code\` in backticks</span>
+					<textarea name="explanation" rows="4">${esc(fields.explanation)}</textarea></label>
+				<label>Code ${fields.codeIsRaw ? '<span class="cd-hint">several code blocks: edit them as Markdown</span>' : ''}
+					<textarea name="code" rows="5" class="cd-mono cd-code">${esc(fields.code)}</textarea></label>
+				${
+					fields.codeIsRaw
+						? ''
+						: `<div class="cd-row2 cd-row-inline">
+							<label>Language<input name="lang" class="cd-mono" value="${esc(fields.lang)}" placeholder="sql, python…"></label>
+							<label class="cd-check"><input type="checkbox" name="run" ${fields.run ? 'checked' : ''}> Add a Run button</label>
+						</div>`
+				}`;
+			const form = this.open(editing ? `Edit ${editTerm}` : 'New term', body, async (f) => {
+				const d = new FormData(f);
+				const payload = {
+					action: editing ? 'edit-term' : 'add-term',
+					file: editing ? this.file : d.get('file'),
+					section: d.get('section') || '',
+					originalTerm: editTerm,
+					term: d.get('term'),
+					short: d.get('short'),
+					explanation: d.get('explanation'),
+					code: d.get('code'),
+					lang: d.get('lang') ?? fields.lang,
+					run: d.get('run') === 'on',
+					codeIsRaw: !!fields.codeIsRaw,
+				};
+				if (!payload.file) throw new Error('Choose a topic first.');
+				await this.save(f, payload);
+			});
+
+			// Live character count for the short meaning.
+			const short = form.querySelector<HTMLInputElement>('input[name=short]')!;
+			const count = form.querySelector('.cd-count')!;
+			const updateCount = () => (count.textContent = `${short.value.length} / 40`);
+			short.addEventListener('input', updateCount);
+			updateCount();
+
+			// Section list follows the chosen topic; language follows the dictionary.
+			const fileSel = form.querySelector<HTMLSelectElement>('select[name=file]');
+			const sectionSel = form.querySelector<HTMLSelectElement>('select[name=section]');
+			const langInput = form.querySelector<HTMLInputElement>('input[name=lang]');
+			const runBox = form.querySelector<HTMLInputElement>('input[name=run]');
+			if (fileSel && sectionSel) {
+				const fillSections = () => {
+					const opt = fileSel.selectedOptions[0];
+					const vol = opt?.dataset.volume || this.volume;
+					const topic = this.topics?.flatMap((v) => v.topics).find((t) => t.file === fileSel.value);
+					const onThisPage =
+						fileSel.value === this.file
+							? [...document.querySelectorAll('.sl-markdown-content h2')].map((h) => h.textContent?.trim() || '')
+							: (topic?.sections ?? []);
+					sectionSel.innerHTML =
+						onThisPage.map((s) => `<option>${esc(s)}</option>`).join('') + '<option value="">End of the page</option>';
+					if (onThisPage.length) sectionSel.value = onThisPage[onThisPage.length - 1];
+					if (langInput && !editing) {
+						langInput.value = this.langFor(vol);
+						if (runBox) runBox.checked = runnable(langInput.value) && runBox.checked;
+					}
+				};
+				fileSel.addEventListener('change', fillSections);
+				fillSections();
+			}
+		}
+
+		topicForm() {
+			const name = document.querySelector('.cd-vol-name span:last-child')?.textContent || 'this dictionary';
+			this.open(
+				`New topic in ${name}`,
+				`<label>Name<input name="title" required placeholder="e.g. Date functions" autocomplete="off"></label>
+				 <label>Description <span class="cd-hint">optional, one line</span><input name="description" autocomplete="off"></label>`,
+				async (f) => {
+					const d = new FormData(f);
+					await this.save(f, { action: 'add-topic', volume: this.volume, title: d.get('title'), description: d.get('description') });
+				},
+			);
+		}
+
+		volumeForm() {
+			const form = this.open(
+				'New dictionary',
+				`<div class="cd-volume-form">
+					<div class="cd-volume-fields">
+						<label>Name<input name="name" required placeholder="e.g. JavaScript" autocomplete="off"></label>
+						<label>Short description <span class="cd-hint">shown on the home card</span>
+							<input name="description" placeholder="e.g. Variables, functions, arrays…" autocomplete="off"></label>
+						<label>Starting topics <span class="cd-hint">one per line, optional</span>
+							<textarea name="topics" rows="3" placeholder="Variables\nFunctions"></textarea></label>
+						<fieldset class="cd-spines"><legend>Spine colour</legend>
+							${SPINES.map(
+								(c, i) =>
+									`<label><input type="radio" name="spine" value="${c}" ${i === 0 ? 'checked' : ''} aria-label="${c}"><span style="background:${c}"></span></label>`,
+							).join('')}
+						</fieldset>
+					</div>
+					<div class="cd-volume-preview" aria-hidden="true">
+						<span class="cd-pv-spine"></span>
+						<span class="cd-pv-body"><span class="cd-pv-name">New dictionary</span><span class="cd-pv-desc"></span></span>
+					</div>
+				</div>`,
+				async (f) => {
+					const d = new FormData(f);
+					await this.save(f, {
+						action: 'add-volume',
+						name: d.get('name'),
+						description: d.get('description'),
+						spine: d.get('spine'),
+						topics: String(d.get('topics') || '').split('\n'),
+					});
+				},
+			);
+			const preview = () => {
+				const d = new FormData(form);
+				form.querySelector<HTMLElement>('.cd-pv-spine')!.style.background = String(d.get('spine'));
+				form.querySelector('.cd-pv-name')!.textContent = String(d.get('name') || 'New dictionary');
+				form.querySelector('.cd-pv-desc')!.textContent = String(d.get('description') || '');
+			};
+			form.addEventListener('input', preview);
+			preview();
+		}
+	}
+	customElements.define('cd-edit', EditTools);
+</script>
+
+<style is:global>
+	cd-edit {
+		display: block;
+	}
+	.cd-signin {
+		display: inline-block;
+		margin-top: 1.5rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	.cd-btn {
+		font: inherit;
+		font-size: var(--sl-text-sm);
+		min-height: 2.5rem;
+		padding: 0 1rem;
+		border: 1px solid var(--cd-card-border);
+		border-radius: 999px;
+		background: var(--cd-card-bg);
+		color: var(--sl-color-white);
+		cursor: pointer;
+	}
+	.cd-btn:hover {
+		border-color: var(--sl-color-accent);
+	}
+	.cd-btn-primary {
+		border-color: var(--sl-color-accent);
+		background: var(--sl-color-accent);
+		color: var(--sl-color-black);
+	}
+	:root[data-theme='light'] .cd-btn-primary {
+		color: #fff;
+	}
+	.cd-btn-link {
+		font: inherit;
+		font-size: var(--sl-text-sm);
+		padding: 0.4rem 0;
+		border: 0;
+		background: none;
+		color: var(--sl-color-accent);
+		cursor: pointer;
+		text-align: start;
+	}
+	.cd-editbar {
+		position: fixed;
+		z-index: 50;
+		inset-inline-end: 1rem;
+		bottom: 1rem;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 0.9rem;
+		max-width: calc(100vw - 2rem);
+		padding: 0.5rem 0.6rem 0.5rem 0.5rem;
+		border: 1px solid var(--cd-card-border);
+		border-radius: 999px;
+		background: var(--cd-card-bg);
+		box-shadow: 0 10px 30px rgb(30 20 10 / 0.18);
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+	.cd-editbar .cd-btn-link {
+		padding-inline-end: 0.4rem;
+	}
+	.cd-add-term {
+		margin: 0 0 1rem;
+	}
+	.cd-pencil {
+		display: none;
+	}
+	body.cd-editing .cd-row {
+		grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) 2.25rem 1.25rem;
+	}
+	.cd-editing .cd-pencil {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border: 0;
+		border-radius: 50%;
+		background: none;
+		color: var(--sl-color-gray-3);
+		cursor: pointer;
+	}
+	.cd-editing .cd-pencil:hover {
+		background: var(--sl-color-gray-6);
+		color: var(--sl-color-accent);
+	}
+	@media (max-width: 50rem) {
+		body.cd-editing .cd-row {
+			grid-template-columns: minmax(0, 1fr) 2.25rem 1.25rem;
+		}
+		body.cd-editing .cd-pencil {
+			grid-column: 2;
+			grid-row: 1 / span 2;
+		}
+		body.cd-editing .cd-chevron {
+			grid-column: 3;
+		}
+	}
+	.cd-add-topic {
+		margin-top: 0.75rem;
+	}
+	.cd-add-volume {
+		min-height: 15rem;
+		border: 2px dashed var(--cd-card-border);
+		border-radius: 0.25rem;
+		background: transparent;
+		font: inherit;
+		font-size: var(--sl-text-2xl);
+		font-style: italic;
+		color: var(--sl-color-gray-2);
+		cursor: pointer;
+	}
+	.cd-add-volume:hover {
+		border-color: var(--sl-color-accent);
+		color: var(--sl-color-accent);
+	}
+
+	/* The form window */
+	.cd-dialog {
+		width: min(44rem, calc(100vw - 2rem));
+		max-height: calc(100dvh - 2rem);
+		padding: 0;
+		border: 1px solid var(--cd-card-border);
+		border-radius: 0.6rem;
+		background: var(--sl-color-black);
+		color: var(--sl-color-white);
+		box-shadow: 0 24px 60px rgb(30 20 10 / 0.3);
+	}
+	.cd-dialog::backdrop {
+		background: rgb(36 33 29 / 0.45);
+	}
+	.cd-form {
+		display: flex;
+		flex-direction: column;
+		max-height: calc(100dvh - 2rem);
+	}
+	.cd-form-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem 1.25rem 0.5rem;
+	}
+	.cd-form-head h2 {
+		margin: 0;
+		font-size: var(--sl-text-2xl);
+		font-weight: 500;
+	}
+	.cd-close {
+		width: 2.5rem;
+		height: 2.5rem;
+		border: 0;
+		background: none;
+		color: var(--sl-color-gray-3);
+		font-size: 1.1rem;
+		cursor: pointer;
+	}
+	.cd-form-body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+		padding: 0.5rem 1.25rem 1rem;
+		overflow-y: auto;
+	}
+	.cd-form-body label {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+	.cd-form-body input:not([type='checkbox'], [type='radio']),
+	.cd-form-body textarea,
+	.cd-form-body select {
+		font: inherit;
+		font-size: var(--sl-text-base);
+		padding: 0.55rem 0.7rem;
+		border: 1px solid var(--cd-card-border);
+		border-radius: 0.4rem;
+		background: var(--cd-card-bg);
+		color: var(--sl-color-white);
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.cd-form-body textarea {
+		resize: vertical;
+	}
+	.cd-form-body .cd-mono {
+		font-family: var(--sl-font-mono);
+		font-size: var(--sl-text-sm);
+	}
+	.cd-form-body .cd-code {
+		background: var(--cd-code-bg);
+		border-color: transparent;
+		line-height: 1.6;
+	}
+	.cd-row2 {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.9rem;
+	}
+	.cd-row-inline {
+		align-items: end;
+	}
+	.cd-form-body .cd-check {
+		flex-direction: row;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.6rem;
+	}
+	.cd-check input {
+		width: 1.1rem;
+		height: 1.1rem;
+		accent-color: var(--sl-color-accent);
+	}
+	.cd-label-row {
+		display: flex;
+		justify-content: space-between;
+	}
+	.cd-hint {
+		font-style: italic;
+		color: var(--sl-color-gray-3);
+	}
+	.cd-form-foot {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.75rem;
+		padding: 0.9rem 1.25rem 1.1rem;
+		border-top: 1px solid var(--cd-rule);
+	}
+	.cd-status {
+		flex: 1 1 14rem;
+		margin: 0;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	.cd-status.cd-ok {
+		color: var(--sl-color-white);
+	}
+	.cd-error {
+		color: var(--cd-err);
+	}
+	.cd-volume-form {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) 13rem;
+		gap: 1.25rem;
+	}
+	.cd-volume-fields {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+	.cd-spines {
+		display: flex;
+		gap: 0.6rem;
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+	.cd-spines legend {
+		margin-bottom: 0.4rem;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-2);
+	}
+	.cd-spines label {
+		position: relative;
+		display: block;
+	}
+	.cd-spines input {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		cursor: pointer;
+	}
+	.cd-spines span {
+		display: block;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 50%;
+	}
+	.cd-spines input:checked + span {
+		box-shadow: 0 0 0 3px var(--sl-color-black), 0 0 0 5px var(--sl-color-white);
+	}
+	.cd-spines input:focus-visible + span {
+		outline: 2px solid var(--sl-color-accent);
+		outline-offset: 4px;
+	}
+	.cd-volume-preview {
+		display: flex;
+		min-height: 13rem;
+		align-self: start;
+		border: 1px solid var(--cd-card-border);
+		border-radius: 0.25rem;
+		background: var(--sl-color-gray-6);
+		overflow: hidden;
+	}
+	.cd-pv-spine {
+		width: 0.7rem;
+		flex: none;
+	}
+	.cd-pv-body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		padding: 1.1rem;
+	}
+	.cd-pv-name {
+		font-size: var(--sl-text-2xl);
+		font-weight: 500;
+		line-height: 1.1;
+		overflow-wrap: anywhere;
+	}
+	.cd-pv-desc {
+		margin-top: auto;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	@media (max-width: 40rem) {
+		.cd-dialog {
+			width: 100vw;
+			max-width: 100vw;
+			height: 100dvh;
+			max-height: 100dvh;
+			margin: 0;
+			border-radius: 0;
+		}
+		.cd-form {
+			height: 100%;
+			max-height: 100dvh;
+		}
+		.cd-form-body {
+			flex: 1;
+		}
+		.cd-row2,
+		.cd-volume-form {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.cd-volume-preview {
+			display: none;
+		}
+		.cd-editbar {
+			inset-inline: 0.75rem;
+			bottom: 0.75rem;
+			justify-content: space-between;
+			border-radius: 1rem;
+		}
+		.cd-editbar-who {
+			display: none;
+		}
+	}
+</style>

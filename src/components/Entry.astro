@@ -28,7 +28,7 @@ const slug =
 const hasCode = Astro.slots.has('code');
 ---
 
-<details class="cd-entry" open={open}>
+<details class="cd-entry" open={open} data-term={term}>
 	<summary class="cd-row not-content">
 		<h3 class="cd-term" id={slug}>{term}</h3>
 		{short && <span class="cd-short">{short}</span>}
