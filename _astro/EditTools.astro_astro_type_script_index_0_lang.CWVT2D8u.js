@@ -1,0 +1,50 @@
+var e=e=>String(e??``).replace(/[&<>"']/g,e=>({"&":`&amp;`,"<":`&lt;`,">":`&gt;`,'"':`&quot;`,"'":`&#39;`})[e]),t=[`#9a3c22`,`#3f5e3a`,`#2e4a6e`,`#a8741a`],n=class extends HTMLElement{base=`/`;file=``;volume=``;dialog;topics;async connectedCallback(){this.base=this.dataset.base||`/`,this.file=this.dataset.file||``,this.volume=this.dataset.volume||``;let e;try{e=await fetch(`${this.base}api/me`,{credentials:`same-origin`})}catch{return}if(!(e.headers.get(`content-type`)||``).includes(`application/json`))return;let t=await e.json();if(t.signedIn)this.setup(t.login);else{let e=this.querySelector(`.cd-signin`);e.href=`${this.base}api/auth/login?back=${encodeURIComponent(location.pathname)}`,e.hidden=!1}}setup(t){document.body.classList.add(`cd-editing`),this.dialog=document.createElement(`dialog`),this.dialog.className=`cd-dialog`,document.body.append(this.dialog);let n=document.createElement(`div`);n.className=`cd-editbar`,n.innerHTML=`
+				<button type="button" class="cd-btn cd-btn-primary" data-act="term">+ New term</button>
+				<span class="cd-editbar-who">Editing as <strong>${e(t)}</strong></span>
+				<button type="button" class="cd-btn-link" data-act="signout">Sign out</button>`,n.addEventListener(`click`,async e=>{let t=e.target.closest(`button`)?.dataset.act;t===`term`&&this.termForm(),t===`signout`&&(await fetch(`${this.base}api/auth/logout`,{method:`POST`}),location.reload())}),document.body.append(n);let r=document.querySelector(`.sl-markdown-content`);if(this.file&&r){let e=document.createElement(`button`);e.type=`button`,e.className=`cd-btn cd-add-term`,e.textContent=`+ New term on this page`,e.addEventListener(`click`,()=>this.termForm()),r.prepend(e),document.querySelectorAll(`details.cd-entry[data-term]`).forEach(e=>{let t=document.createElement(`button`);t.type=`button`,t.className=`cd-pencil`,t.setAttribute(`aria-label`,`Edit ${e.dataset.term}`),t.innerHTML=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>`,t.addEventListener(`click`,t=>{t.preventDefault(),t.stopPropagation(),this.termForm(e.dataset.term)}),e.querySelector(`summary`)?.insertBefore(t,e.querySelector(`.cd-chevron`))})}let i=document.querySelector(`.cd-key`);if(this.volume&&i){let e=document.createElement(`button`);e.type=`button`,e.className=`cd-btn-link cd-add-topic`,e.textContent=`+ New topic`,e.addEventListener(`click`,()=>this.topicForm()),i.before(e)}let a=document.querySelector(`.cd-shelf`);if(a){let e=document.createElement(`button`);e.type=`button`,e.className=`cd-add-volume`,e.textContent=`+ Add a language`,e.addEventListener(`click`,()=>this.volumeForm()),a.append(e)}}async loadTopics(){return this.topics||=await fetch(`${this.base}topics.json`).then(e=>e.json()),this.topics}open(t,n,r){this.dialog.innerHTML=`
+				<form method="dialog" class="cd-form">
+					<header class="cd-form-head">
+						<h2>${e(t)}</h2>
+						<button type="button" class="cd-close" aria-label="Close">✕</button>
+					</header>
+					<div class="cd-form-body">${n}</div>
+					<footer class="cd-form-foot">
+						<p class="cd-status" role="status"></p>
+						<button type="submit" class="cd-btn cd-btn-primary">Save</button>
+					</footer>
+				</form>`;let i=this.dialog.querySelector(`form`);return i.querySelector(`.cd-close`).addEventListener(`click`,()=>this.dialog.close()),i.addEventListener(`submit`,async e=>{e.preventDefault();let t=i.querySelector(`button[type=submit]`),n=i.querySelector(`.cd-status`);t.disabled=!0,n.className=`cd-status`,n.textContent=`Saving…`;try{await r(i)}catch(e){n.className=`cd-status cd-error`,n.textContent=e.message,t.disabled=!1}}),this.dialog.showModal(),i.querySelector(`input:not([type=hidden]), textarea`)?.focus(),i}async save(t,n){let r=await fetch(`${this.base}api/save`,{method:`POST`,headers:{"content-type":`application/json`},body:JSON.stringify(n)}),i=await r.json().catch(()=>({error:`Something went wrong.`}));if(!r.ok||!i.ok)throw Error(i.error||`Could not save.`);let a=t.querySelector(`.cd-status`);a.className=`cd-status cd-ok`,a.innerHTML=i.unchanged?`Nothing changed.`:`Saved to GitHub. <strong>Going live in about a minute…</strong> ${i.commit?`<a href="${e(i.commit)}" target="_blank" rel="noopener">See change</a>`:``}`;let o=t.querySelector(`button[type=submit]`);o.textContent=`Done`,o.disabled=!1,o.type=`button`,o.onclick=()=>this.dialog.close()}langFor(e){return e===`sql`?`sql`:e===`python`?`python`:`text`}async termForm(t){let n=!!t,r={term:``,short:``,explanation:``,code:``,lang:this.langFor(this.volume),run:!1},i=``;if(n){this.open(`Loading…`,`<p>Loading the term…</p>`,async()=>{});let n=await fetch(`${this.base}api/entry?file=${encodeURIComponent(this.file)}&term=${encodeURIComponent(t)}`),i=await n.json();if(!n.ok){this.dialog.querySelector(`.cd-form-body`).innerHTML=`<p class="cd-error">${e(i.error)}</p>`;return}r=i}else{let t=(await this.loadTopics()).map(t=>`<optgroup label="${e(t.name)}">${t.topics.map(n=>`<option value="${e(n.file)}" data-volume="${e(t.id)}" ${n.file===this.file?`selected`:``}>${e(n.title)}</option>`).join(``)}</optgroup>`).join(``);i=`
+					<div class="cd-row2">
+						<label>Topic<select name="file" required>${this.file?``:`<option value="">Choose a topic…</option>`}${t}</select></label>
+						<label>Section<select name="section"></select></label>
+					</div>`}let a=e=>e===`sql`||e===`python`,o=`
+				${i}
+				<div class="cd-row2">
+					<label>Term<input name="term" class="cd-mono" required value="${e(r.term)}" autocomplete="off"></label>
+					<label><span class="cd-label-row">Short meaning <span class="cd-count"></span></span>
+						<input name="short" maxlength="40" value="${e(r.short)}" placeholder="e.g. All left rows + their matches" autocomplete="off"></label>
+				</div>
+				<label>Full explanation <span class="cd-hint">shown when the term is opened · Markdown, \`code\` in backticks</span>
+					<textarea name="explanation" rows="4">${e(r.explanation)}</textarea></label>
+				<label>Code ${r.codeIsRaw?`<span class="cd-hint">several code blocks: edit them as Markdown</span>`:``}
+					<textarea name="code" rows="5" class="cd-mono cd-code">${e(r.code)}</textarea></label>
+				${r.codeIsRaw?``:`<div class="cd-row2 cd-row-inline">
+							<label>Language<input name="lang" class="cd-mono" value="${e(r.lang)}" placeholder="sql, python…"></label>
+							<label class="cd-check"><input type="checkbox" name="run" ${r.run?`checked`:``}> Add a Run button</label>
+						</div>`}`,s=this.open(n?`Edit ${t}`:`New term`,o,async e=>{let i=new FormData(e),a={action:n?`edit-term`:`add-term`,file:n?this.file:i.get(`file`),section:i.get(`section`)||``,originalTerm:t,term:i.get(`term`),short:i.get(`short`),explanation:i.get(`explanation`),code:i.get(`code`),lang:i.get(`lang`)??r.lang,run:i.get(`run`)===`on`,codeIsRaw:!!r.codeIsRaw};if(!a.file)throw Error(`Choose a topic first.`);await this.save(e,a)}),c=s.querySelector(`input[name=short]`),l=s.querySelector(`.cd-count`),u=()=>l.textContent=`${c.value.length} / 40`;c.addEventListener(`input`,u),u();let d=s.querySelector(`select[name=file]`),f=s.querySelector(`select[name=section]`),p=s.querySelector(`input[name=lang]`),m=s.querySelector(`input[name=run]`);if(d&&f){let t=()=>{let t=d.selectedOptions[0]?.dataset.volume||this.volume,r=this.topics?.flatMap(e=>e.topics).find(e=>e.file===d.value),i=d.value===this.file?[...document.querySelectorAll(`.sl-markdown-content h2`)].map(e=>e.textContent?.trim()||``):r?.sections??[];f.innerHTML=i.map(t=>`<option>${e(t)}</option>`).join(``)+`<option value="">End of the page</option>`,i.length&&(f.value=i[i.length-1]),p&&!n&&(p.value=this.langFor(t),m&&(m.checked=a(p.value)&&m.checked))};d.addEventListener(`change`,t),t()}}topicForm(){let e=document.querySelector(`.cd-vol-name span:last-child`)?.textContent||`this dictionary`;this.open(`New topic in ${e}`,`<label>Name<input name="title" required placeholder="e.g. Date functions" autocomplete="off"></label>
+				 <label>Description <span class="cd-hint">optional, one line</span><input name="description" autocomplete="off"></label>`,async e=>{let t=new FormData(e);await this.save(e,{action:`add-topic`,volume:this.volume,title:t.get(`title`),description:t.get(`description`)})})}volumeForm(){let e=this.open(`New dictionary`,`<div class="cd-volume-form">
+					<div class="cd-volume-fields">
+						<label>Name<input name="name" required placeholder="e.g. JavaScript" autocomplete="off"></label>
+						<label>Short description <span class="cd-hint">shown on the home card</span>
+							<input name="description" placeholder="e.g. Variables, functions, arrays…" autocomplete="off"></label>
+						<label>Starting topics <span class="cd-hint">one per line, optional</span>
+							<textarea name="topics" rows="3" placeholder="Variables\nFunctions"></textarea></label>
+						<fieldset class="cd-spines"><legend>Spine colour</legend>
+							${t.map((e,t)=>`<label><input type="radio" name="spine" value="${e}" ${t===0?`checked`:``} aria-label="${e}"><span style="background:${e}"></span></label>`).join(``)}
+						</fieldset>
+					</div>
+					<div class="cd-volume-preview" aria-hidden="true">
+						<span class="cd-pv-spine"></span>
+						<span class="cd-pv-body"><span class="cd-pv-name">New dictionary</span><span class="cd-pv-desc"></span></span>
+					</div>
+				</div>`,async e=>{let t=new FormData(e);await this.save(e,{action:`add-volume`,name:t.get(`name`),description:t.get(`description`),spine:t.get(`spine`),topics:String(t.get(`topics`)||``).split(`
+`)})}),n=()=>{let t=new FormData(e);e.querySelector(`.cd-pv-spine`).style.background=String(t.get(`spine`)),e.querySelector(`.cd-pv-name`).textContent=String(t.get(`name`)||`New dictionary`),e.querySelector(`.cd-pv-desc`).textContent=String(t.get(`description`)||``)};e.addEventListener(`input`,n),n()}};customElements.define(`cd-edit`,n);
