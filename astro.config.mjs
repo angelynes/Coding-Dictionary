@@ -26,7 +26,8 @@ export default defineConfig({
 			],
 			// Inside a dictionary, the sidebar shows only that dictionary's topics.
 			routeMiddleware: './src/routeData.ts',
-			logo: { src: './src/assets/logo.svg', replacesTitle: false },
+			// Book spine: rust on paper, light on dark.
+			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', replacesTitle: false },
 			customCss: ['./src/styles/theme.css'],
 			lastUpdated: false,
 			expressiveCode: {
@@ -46,13 +47,11 @@ export default defineConfig({
 				},
 			},
 			components: {
-				// Adds the flashcards for each page under its content.
-				MarkdownContent: './src/components/overrides/MarkdownContent.astro',
 				// Dictionary name and switch on top, colour key at the bottom.
 				Sidebar: './src/components/overrides/Sidebar.astro',
 			},
 			sidebar: [
-				{ label: 'Start here', items: [{ label: 'How to use this', slug: 'guide' }, { label: 'Revise (flashcards)', link: '/revise/' }] },
+				{ label: 'Start here', items: [{ label: 'How to use this', slug: 'guide' }] },
 				// Pages are added automatically from each folder.
 				// Order them with `sidebar: { order: N }` in a page's frontmatter.
 				{ label: 'Python', items: [{ autogenerate: { directory: 'python' } }] },

@@ -6,7 +6,6 @@ built with [Astro Starlight](https://starlight.astro.build).
 - **Search**: press `/` or `⌘K`
 - **Runnable code**: any ` ```python run ` or ` ```sql run ` block becomes an editable box
   (Python runs on Pyodide; SQL runs on SQLite with `src/data/sample-db.sql`)
-- **Flashcards**: add `flashcards:` to a page's frontmatter; all of them appear on `/revise`
 
 ## Commands
 
@@ -19,7 +18,7 @@ built with [Astro Starlight](https://starlight.astro.build).
 ## Where things live
 
 - `src/content/docs/python/`, `src/content/docs/sql/`: one `.mdx` file per topic
-- `src/components/`: `Entry`, `Value`, `Concept`, `Keyword`, `Legend`, `RunPython`, `RunSQL`, `Flashcards`
+- `src/components/`: `Entry`, `Value`, `Concept`, `Keyword`, `Legend`, `RunPython`, `RunSQL`
 - `src/styles/theme.css`: colours (lavender headers, Value / CODE / CONCEPT legend)
 - `astro.config.mjs`: site title and sidebar
 
