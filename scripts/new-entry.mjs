@@ -34,9 +34,6 @@ title: ${title}
 description: One line about what this page covers.
 sidebar:
   order: ${order}
-flashcards:
-  - q: A question to test yourself
-    a: "The answer. Use \`backticks\` for code."
 ---
 
 import { Value, Concept, Keyword, Entry } from '@components';

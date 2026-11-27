@@ -8,8 +8,8 @@ export const collections = {
 		loader: docsLoader(),
 		schema: docsSchema({
 			extend: z.object({
-				// Flashcards for this page. They are studied in the dictionary's
-				// Revise room (/python/revise/, /sql/revise/); the page links there.
+				// Flashcards for this page. Not shown on the site for now,
+				// kept so they can be brought back later.
 				flashcards: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
 			}),
 		}),
