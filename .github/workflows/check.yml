@@ -1,12 +1,13 @@
 # Builds the site for every pull request, without publishing it.
-# The built site is attached to the run, so changes can be checked before merging.
+# The built files are saved to the `check-preview` branch so they can be
+# looked at before merging. That branch is temporary and safe to delete.
 name: Check build
 
 on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -14,3 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: withastro/action@v6
+      - name: Save the built site to the check-preview branch
+        env:
+          TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          cd dist
+          git init -q
+          git checkout -q -b check-preview
+          git add -A
+          git -c user.name="check build" -c user.email="actions@users.noreply.github.com" commit -qm "Built site for $SHA"
+          git push -fq "https://x-access-token:${TOKEN}@github.com/${REPO}.git" check-preview
