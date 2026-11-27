@@ -25,6 +25,6 @@ built with [Astro Starlight](https://starlight.astro.build).
 
 ## Publishing on GitHub Pages
 
-1. Create a GitHub repo named `coding-dictionary` and push this folder to it.
-2. In `astro.config.mjs`, set `site: 'https://<username>.github.io'` and `base: '/coding-dictionary'`.
+1. Create a GitHub repo (here: `Coding-Dictionary`) and push this folder to it.
+2. In `astro.config.mjs`, set `site: 'https://<username>.github.io'` and `base: '/Coding-Dictionary'`.
 3. On GitHub: **Settings → Pages → Source: GitHub Actions**. Every push to `main` then redeploys.

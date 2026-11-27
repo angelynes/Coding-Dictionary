@@ -4,9 +4,9 @@ import starlight from '@astrojs/starlight';
 import remarkRunnable from './src/plugins/remark-runnable.mjs';
 
 export default defineConfig({
-	// Published at https://angelynes.github.io/coding-dictionary/
+	// Published at https://angelynes.github.io/Coding-Dictionary/
 	site: 'https://angelynes.github.io',
-	base: '/coding-dictionary',
+	base: '/Coding-Dictionary',
 	// ```sql run / ```python run code blocks become runnable boxes
 	markdown: { remarkPlugins: [remarkRunnable] },
 	integrations: [
