@@ -6,7 +6,7 @@ built with [Astro Starlight](https://starlight.astro.build).
 - **Search**: press `/` or `⌘K`
 - **Runnable code**: any ` ```python run ` or ` ```sql run ` block becomes an editable box
   (Python runs on Pyodide; SQL runs on SQLite with `src/data/sample-db.sql`)
-- **Flashcards**: add `flashcards:` to a page's frontmatter; all of them appear on `/revise`
+- **Flashcards**: add `flashcards:` to a page's frontmatter; each dictionary's Revise room (`/python/revise/`, `/sql/revise/`) lets you pick topics and study them
 
 ## Commands
 

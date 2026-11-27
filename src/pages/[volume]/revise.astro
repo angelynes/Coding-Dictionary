@@ -1,0 +1,181 @@
+---
+/**
+ * The Revise room for one dictionary: tick the topics to study,
+ * then go through their flashcards, shuffled.
+ * Open with ?topic=<page id> to start with just that topic ticked.
+ */
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection } from 'astro:content';
+import Flashcards from '../../components/Flashcards.astro';
+import { volumes, findVolume } from '../../volumes';
+
+export function getStaticPaths() {
+	return volumes.map((v) => ({ params: { volume: v.id } }));
+}
+
+const volume = findVolume(Astro.params.volume)!;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const docs = (await getCollection('docs'))
+	.filter((d) => d.id === volume.id || d.id.startsWith(`${volume.id}/`))
+	.sort((a, b) => (a.data.sidebar.order ?? 99) - (b.data.sidebar.order ?? 99));
+
+const topics = docs
+	.map((d) => ({
+		id: d.id,
+		title: d.data.sidebar.label ?? d.data.title,
+		cards: (d.data.flashcards ?? []).map((c) => ({
+			...c,
+			topic: d.id,
+			source: d.data.title,
+			href: `${base}/${d.id}/`,
+		})),
+	}))
+	.filter((t) => t.cards.length > 0);
+const all = topics.flatMap((t) => t.cards);
+---
+
+<StarlightPage
+	frontmatter={{
+		title: `Revise ${volume.name}`,
+		description: `Flashcards from the ${volume.name} dictionary.`,
+		tableOfContents: false,
+	}}
+>
+	<cd-revise data-cards={JSON.stringify(all)}>
+		<fieldset class="cd-topics not-content">
+			<legend class="cd-smallcaps">Revise which topics?</legend>
+			<div class="cd-topic-list">
+				{
+					topics.map((t) => (
+						<label class="cd-topic">
+							<input type="checkbox" value={t.id} checked />
+							<span class="cd-topic-name">{t.title}</span>
+							<span class="cd-topic-n">{t.cards.length}</span>
+						</label>
+					))
+				}
+			</div>
+			<p class="cd-topic-summary">
+				<span class="cd-selected"><strong>{all.length}</strong> of {all.length} cards</span>
+				<button type="button" data-select="all">Select all</button>
+				<button type="button" data-select="none">Clear</button>
+			</p>
+		</fieldset>
+
+		<Flashcards cards={all} shuffle id="cd-revise-deck" />
+	</cd-revise>
+</StarlightPage>
+
+<script>
+	interface Card {
+		q: string;
+		a: string;
+		topic: string;
+		source?: string;
+		href?: string;
+	}
+	type Deck = HTMLElement & { setCards(cards: Card[], shuffle?: boolean): void };
+
+	class Revise extends HTMLElement {
+		connectedCallback() {
+			const all: Card[] = JSON.parse(this.dataset.cards || '[]');
+			const boxes = [...this.querySelectorAll<HTMLInputElement>('.cd-topic input')];
+			const deck = this.querySelector('flash-cards') as Deck;
+			const summary = this.querySelector('.cd-selected')!;
+
+			const update = () => {
+				const picked = new Set(boxes.filter((b) => b.checked).map((b) => b.value));
+				const cards = all.filter((c) => picked.has(c.topic));
+				summary.innerHTML = `<strong>${cards.length}</strong> of ${all.length} cards`;
+				deck.setCards(cards, true);
+			};
+
+			// ?topic=sql/joins-and-set-operations starts with only that topic ticked.
+			const only = new URLSearchParams(location.search).get('topic');
+			if (only && boxes.some((b) => b.value === only)) {
+				boxes.forEach((b) => (b.checked = b.value === only));
+				// Wait for the deck to be ready before refilling it.
+				customElements.whenDefined('flash-cards').then(update);
+			}
+
+			this.addEventListener('change', (e) => {
+				if ((e.target as HTMLElement).matches('.cd-topic input')) update();
+			});
+			this.querySelector('.cd-topic-summary')!.addEventListener('click', (e) => {
+				const which = (e.target as HTMLElement).closest('button')?.dataset.select;
+				if (!which) return;
+				boxes.forEach((b) => (b.checked = which === 'all'));
+				update();
+			});
+		}
+	}
+	customElements.define('cd-revise', Revise);
+</script>
+
+<style>
+	cd-revise {
+		display: block;
+	}
+	.cd-topics {
+		margin: 0 0 1.75rem;
+		padding: 0;
+		border: 0;
+	}
+	.cd-topics legend {
+		padding: 0;
+		margin-bottom: 0.6rem;
+		font-size: var(--sl-text-sm);
+	}
+	.cd-topic-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+	.cd-topic {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-height: 2.5rem;
+		padding: 0.25rem 0.85rem 0.25rem 0.65rem;
+		border: 1px solid var(--cd-card-border);
+		border-radius: 999px;
+		background: var(--cd-card-bg);
+		cursor: pointer;
+		font-size: var(--sl-text-base);
+		color: var(--sl-color-gray-2);
+	}
+	.cd-topic:has(input:checked) {
+		border-color: var(--sl-color-white);
+		background: var(--sl-color-white);
+		color: var(--sl-color-black);
+	}
+	.cd-topic input {
+		width: 1rem;
+		height: 1rem;
+		margin: 0;
+		accent-color: var(--sl-color-accent);
+	}
+	.cd-topic-n {
+		font-size: var(--sl-text-sm);
+		opacity: 0.7;
+	}
+	.cd-topic-summary {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.25rem 1rem;
+		margin: 0.9rem 0 0;
+		font-size: var(--sl-text-sm);
+		color: var(--sl-color-gray-3);
+	}
+	.cd-topic-summary button {
+		font: inherit;
+		padding: 0.35rem 0;
+		border: 0;
+		background: none;
+		color: var(--sl-color-accent);
+		cursor: pointer;
+		text-decoration: underline;
+	}
+</style>

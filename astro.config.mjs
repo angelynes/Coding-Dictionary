@@ -26,7 +26,8 @@ export default defineConfig({
 			],
 			// Inside a dictionary, the sidebar shows only that dictionary's topics.
 			routeMiddleware: './src/routeData.ts',
-			logo: { src: './src/assets/logo.svg', replacesTitle: false },
+			// Book spine: rust on paper, light on dark.
+			logo: { light: './src/assets/logo-light.svg', dark: './src/assets/logo-dark.svg', replacesTitle: false },
 			customCss: ['./src/styles/theme.css'],
 			lastUpdated: false,
 			expressiveCode: {

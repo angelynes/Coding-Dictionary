@@ -12,11 +12,14 @@ interface Card {
 }
 interface Props {
 	cards: Card[];
+	/** Shuffle the cards when the page opens. */
+	shuffle?: boolean;
+	id?: string;
 }
-const { cards } = Astro.props;
+const { cards, shuffle = false, id } = Astro.props;
 ---
 
-<flash-cards class="not-content" data-cards={JSON.stringify(cards)}>
+<flash-cards class="not-content" id={id} data-cards={JSON.stringify(cards)} data-shuffle={shuffle ? '' : undefined}>
 	<div class="fc-top">
 		<span class="fc-count"></span>
 		<span class="fc-score"></span>
@@ -188,7 +191,7 @@ const { cards } = Astro.props;
 
 		connectedCallback() {
 			this.all = JSON.parse(this.dataset.cards || '[]');
-			this.restart(false);
+			this.restart(this.hasAttribute('data-shuffle'));
 			const card = this.querySelector<HTMLButtonElement>('.fc-card')!;
 			card.addEventListener('click', (e) => {
 				if ((e.target as HTMLElement).closest('a')) return;
@@ -207,6 +210,12 @@ const { cards } = Astro.props;
 				if (act === 'shuffle') this.restart(true);
 				if (act === 'restart') this.restart(false);
 			});
+		}
+
+		/** Replace the cards (used by the Revise room when topics change). */
+		setCards(cards: Card[], shuffle = true) {
+			this.all = cards;
+			this.restart(shuffle);
 		}
 
 		restart(shuffle: boolean) {
