@@ -66,8 +66,9 @@ const hasCode = Astro.slots.has('code');
 		margin: 0;
 		background: transparent;
 	}
-	/* The first entry after a heading or paragraph gets the strong top rule. */
-	:global(:not(.cd-entry)) + .cd-entry {
+	/* The first entry after a heading or paragraph gets the strong top rule.
+	   (Astro adds this component's <script> after the first entry, so skip it.) */
+	:global(:not(.cd-entry, script)) + .cd-entry {
 		border-top: 2px solid var(--sl-color-white);
 		margin-top: 1rem;
 	}

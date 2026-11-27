@@ -213,6 +213,6 @@ h1#_top {
 	margin-top: 2.5rem !important;
 	padding-top: 1.2rem;
 	border-top: 1px solid var(--cd-rule);
-	text-align: center;
+	text-align: center !important;
 	color: var(--sl-color-gray-3);
 }
