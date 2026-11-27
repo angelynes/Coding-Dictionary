@@ -1,28 +1,26 @@
 ---
+// The colour key: what each colour means in the notes.
 ---
-<p class="cd-legend" aria-label="Colour legend">
-	<span class="cd-value">Value</span>
-	<span aria-hidden="true">|</span>
-	<span class="cd-code-word">CODE</span>
-	<span aria-hidden="true">|</span>
-	<span class="cd-concept">CONCEPT</span>
-	<span aria-hidden="true">|</span>
-	<span class="cd-keyword">keyword</span>
-</p>
+<ul class="cd-legend" aria-label="Colour key">
+	<li><span class="cd-value">value</span> you choose</li>
+	<li><code class="cd-code-word">CODE</code> type as is</li>
+	<li><span class="cd-concept">concept</span> an idea</li>
+	<li><span class="cd-keyword">keyword</span> built in</li>
+</ul>
 <style>
 	.cd-legend {
-		display: inline-flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		align-items: center;
-		padding: 0.35rem 0.8rem;
-		border: 1px solid var(--cd-card-border);
-		border-radius: 999px;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
 		font-size: var(--sl-text-sm);
-		color: var(--sl-color-gray-3);
+		color: var(--sl-color-gray-2);
 	}
 	.cd-code-word {
+		font-family: var(--sl-font-mono);
+		font-size: 0.85em;
 		color: var(--sl-color-white);
-		font-family: var(--__sl-font-mono);
 	}
 </style>

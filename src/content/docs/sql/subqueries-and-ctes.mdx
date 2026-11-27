@@ -22,7 +22,7 @@ import { Concept, Entry } from '@components';
 
 ## Subqueries
 
-<Entry term="Subquery">
+<Entry term="Subquery" short="A query inside another query">
 <Fragment slot="code">
 
 ```sql run
@@ -39,7 +39,7 @@ When compared with `>`, `=` etc., it has to return a **single** (aggregate) valu
 
 </Entry>
 
-<Entry term="Correlated subquery">
+<Entry term="Correlated subquery" short="Subquery re-run for each row">
 <Fragment slot="code">
 
 ```sql run
@@ -56,7 +56,7 @@ Uses values **from the outer query** (`c.id`) to get its result, so it's **re-ru
 
 </Entry>
 
-<Entry term="Nested subqueries">
+<Entry term="Nested subqueries" short="Subquery inside a subquery">
 <Fragment slot="code">
 
 ```sql run
@@ -85,7 +85,7 @@ PostgreSQL writes `EXTRACT(MONTH FROM date)`. SQLite (used here) writes `strftim
 
 ## CTEs: Common Table Expressions
 
-<Entry term="WITH … AS (…)">
+<Entry term="WITH … AS (…)" short="Name a temporary result (CTE)">
 <Fragment slot="code">
 
 ```sql run
@@ -106,7 +106,7 @@ It creates the temporary virtual table `SeniorCelebs` first, with the rule for w
 
 </Entry>
 
-<Entry term="Multiple CTEs">
+<Entry term="Multiple CTEs" short="One WITH, CTEs split by commas">
 <Fragment slot="code">
 
 ```sql run
@@ -128,7 +128,7 @@ SQL allows only **one `WITH`** at the start. Separate further CTEs with a **comm
 
 ## Formatting missing data
 
-<Entry term="COALESCE()">
+<Entry term="COALESCE()" short="First value that isn't NULL">
 <Fragment slot="code">
 
 ```sql run

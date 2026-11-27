@@ -19,9 +19,8 @@ flashcards:
     a: SQL Server (Microsoft)
 ---
 
-import { Legend, Value, Concept, Entry } from '@components';
+import { Value, Concept, Entry } from '@components';
 
-<Legend />
 
 <Concept>SQL</Concept> (Structured Query Language) is designed to manage, query and manipulate data stored in relational databases. Statements end with `;`.
 
@@ -55,7 +54,7 @@ This is why you **can't** use a `SELECT` alias inside `WHERE` (WHERE runs first)
 
 A <Concept>relational database</Concept> is a database that organises information into one or more tables.
 
-<Entry term="SELECT … FROM …">
+<Entry term="SELECT … FROM …" short="Pick columns from a table">
 <Fragment slot="code">
 
 ```sql run

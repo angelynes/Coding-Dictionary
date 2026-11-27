@@ -27,7 +27,7 @@ import { Value, Concept, Entry } from '@components';
 - <Concept>DDL</Concept> (Data Definition Language) changes the **structure**: `CREATE`, `ALTER`, `DROP`.
 - <Concept>DML</Concept> (Data Manipulation Language) changes the **data**: `INSERT`, `UPDATE`, `DELETE`.
 
-<Entry term="CREATE TABLE">
+<Entry term="CREATE TABLE" short="Make a new table">
 <Fragment slot="code">
 
 ```sql run
@@ -52,7 +52,7 @@ Creates a new table in the database.
 
 </Entry>
 
-<Entry term="ALTER TABLE … ADD COLUMN">
+<Entry term="ALTER TABLE … ADD COLUMN" short="Change a table's structure">
 <Fragment slot="code">
 
 ```sql run
@@ -71,7 +71,7 @@ Modifies the table's structure **without dropping** it.
 
 </Entry>
 
-<Entry term="INSERT INTO">
+<Entry term="INSERT INTO" short="Add a new row">
 <Fragment slot="code">
 
 ```sql run
@@ -87,7 +87,7 @@ Inserts a **new row** into a table. Columns you leave out become `NULL`, or thei
 
 </Entry>
 
-<Entry term="UPDATE … SET … WHERE">
+<Entry term="UPDATE … SET … WHERE" short="Edit existing rows">
 <Fragment slot="code">
 
 ```sql run
@@ -112,7 +112,7 @@ Omitting `WHERE` updates **every single row** in the table.
 
 </Entry>
 
-<Entry term="DELETE FROM … WHERE">
+<Entry term="DELETE FROM … WHERE" short="Delete rows">
 <Fragment slot="code">
 
 ```sql run
@@ -136,7 +136,7 @@ Omitting `WHERE` deletes **all rows**, leaving an empty table.
 
 </Entry>
 
-<Entry term="CREATE VIEW">
+<Entry term="CREATE VIEW" short="Save a query as a virtual table">
 <Fragment slot="code">
 
 ```sql run

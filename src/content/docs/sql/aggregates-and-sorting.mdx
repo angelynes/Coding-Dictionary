@@ -44,7 +44,7 @@ SELECT COUNT(*)              AS all_rows,
 FROM celebs;
 ```
 
-<Entry term="ROUND(value, n)">
+<Entry term="ROUND(value, n)" short="Round to n decimal places">
 <Fragment slot="code">
 
 ```sql run
@@ -63,7 +63,7 @@ FROM celebs;
 
 ## Grouping
 
-<Entry term="GROUP BY">
+<Entry term="GROUP BY" short="Group same values into summary rows">
 <Fragment slot="code">
 
 ```sql run
@@ -78,7 +78,7 @@ Groups rows that have the same values into **summary rows**. Usually used with a
 
 </Entry>
 
-<Entry term="HAVING">
+<Entry term="HAVING" short="Filter after grouping">
 <Fragment slot="code">
 
 ```sql run
@@ -98,7 +98,7 @@ Filters the results **of a GROUP BY**.
 
 ## Ordering & limiting
 
-<Entry term="ORDER BY … ASC / DESC">
+<Entry term="ORDER BY … ASC / DESC" short="Sort results (default ascending)">
 <Fragment slot="code">
 
 ```sql run
@@ -117,7 +117,7 @@ Sorts the results ascending (`ASC`) or descending (`DESC`). The **default is asc
 
 </Entry>
 
-<Entry term="LIMIT">
+<Entry term="LIMIT" short="Return at most N rows">
 <Fragment slot="code">
 
 ```sql run

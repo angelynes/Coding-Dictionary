@@ -28,7 +28,7 @@ import { Value, Concept, Entry } from '@components';
 
 ## Selecting & aliasing
 
-<Entry term='"column name with spaces"'>
+<Entry term='"column name with spaces"' short="Quote names that have spaces">
 <Fragment slot="code">
 
 ```sql run
@@ -42,7 +42,7 @@ Non-standard names: if a column has spaces or special characters, wrap it in **d
 
 </Entry>
 
-<Entry term="AS">
+<Entry term="AS" short="Give a column or table a nickname">
 <Fragment slot="code">
 
 ```sql run
@@ -60,7 +60,7 @@ Aliases a **column** or **table** name to make results easier to read. E.g. `dev
 
 </Entry>
 
-<Entry term="DISTINCT">
+<Entry term="DISTINCT" short="Only unique values">
 <Fragment slot="code">
 
 ```sql run
@@ -82,7 +82,7 @@ Returns only **unique** values.
 
 ## Filtering with WHERE
 
-<Entry term="WHERE">
+<Entry term="WHERE" short="Keep rows that meet a condition">
 <Fragment slot="code">
 
 ```sql run
@@ -99,7 +99,7 @@ Filters the results to only the rows that **fulfil a condition**.
 
 </Entry>
 
-<Entry term="LIKE · NOT LIKE">
+<Entry term="LIKE · NOT LIKE" short="Match a text pattern (% and _)">
 <Fragment slot="code">
 
 ```sql run
@@ -122,7 +122,7 @@ Searches for a **pattern** in a column.
 
 </Entry>
 
-<Entry term="BETWEEN … AND …">
+<Entry term="BETWEEN … AND …" short="In a range, both ends included">
 <Fragment slot="code">
 
 ```sql run
@@ -136,7 +136,7 @@ Selects values within a range, **including both ends**.
 
 </Entry>
 
-<Entry term="IN (…, …, …)">
+<Entry term="IN (…, …, …)" short="Matches any value in a list">
 <Fragment slot="code">
 
 ```sql run
@@ -150,7 +150,7 @@ Lets you list multiple values. A shorthand for several `OR` conditions.
 
 </Entry>
 
-<Entry term="AND · OR">
+<Entry term="AND · OR" short="Combine conditions">
 <Fragment slot="code">
 
 ```sql run
@@ -169,7 +169,7 @@ Logical operators that **combine conditions**. `AND` = both, `OR` = at least one
 
 ## CASE
 
-<Entry term="CASE WHEN … THEN … ELSE … END">
+<Entry term="CASE WHEN … THEN … ELSE … END" short="If / else inside a query">
 <Fragment slot="code">
 
 ```sql run
@@ -191,7 +191,7 @@ Creates different outputs based on conditions, like **if / else**.
 
 </Entry>
 
-<Entry term="CASE in WHERE (no ELSE)">
+<Entry term="CASE in WHERE (no ELSE)" short="No ELSE → NULL for the rest">
 <Fragment slot="code">
 
 ```sql run
@@ -209,7 +209,7 @@ If a `CASE` has **no `ELSE`**, it returns `NULL` for everything else, so `IS NOT
 
 </Entry>
 
-<Entry term="COUNT(CASE …): pivoting">
+<Entry term="COUNT(CASE …): pivoting" short="Count by category, as columns">
 <Fragment slot="code">
 
 ```sql run

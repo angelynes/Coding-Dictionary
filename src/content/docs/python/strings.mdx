@@ -28,7 +28,7 @@ import { Value, Concept, Entry } from '@components';
 
 ## Counting & finding
 
-<Entry term="count()">
+<Entry term="count()" short="How many times it appears">
 <Fragment slot="code">
 
 ```python
@@ -41,7 +41,7 @@ Counts how many times a <Value>substring</Value> appears.
 
 </Entry>
 
-<Entry term="len()">
+<Entry term="len()" short="How many characters">
 <Fragment slot="code">
 
 ```python
@@ -54,7 +54,7 @@ Counts the letters (characters), including spaces.
 
 </Entry>
 
-<Entry term="in · not in">
+<Entry term="in · not in" short="Is the word in the string?">
 <Fragment slot="code">
 
 ```python
@@ -70,7 +70,7 @@ Checks if a word is **in** the string. Result: `True` / `False`.
 
 ## Indexing & slicing
 
-<Entry term="variable[0] · variable[-1]">
+<Entry term="variable[0] · variable[-1]" short="Get one letter (starts at 0)">
 <Fragment slot="code">
 
 ```python
@@ -85,7 +85,7 @@ Gets **one letter**. Counting starts at **0**. Negative numbers count from the b
 
 </Entry>
 
-<Entry term="Slicing [start:end:step]">
+<Entry term="Slicing [start:end:step]" short="Take a chunk; end not included">
 <Fragment slot="code">
 
 ```python
@@ -110,7 +110,7 @@ print(len(word), word.count('o'))
 
 ## Changing strings
 
-<Entry term="replace()">
+<Entry term="replace()" short="Swap one text for another">
 <Fragment slot="code">
 
 ```python
@@ -123,7 +123,7 @@ Replaces every `'#'` with `'o'`.
 
 </Entry>
 
-<Entry term="strip() · rstrip()">
+<Entry term="strip() · rstrip()" short="Remove spaces from the ends">
 <Fragment slot="code">
 
 ```python
@@ -137,7 +137,7 @@ Removes spaces (or new lines) from the right end (`rstrip`) or both ends (`strip
 
 </Entry>
 
-<Entry term="split() · multiple variables at once">
+<Entry term="split() · multiple variables at once" short="Cut into pieces, assign at once">
 <Fragment slot="code">
 
 ```python
@@ -172,7 +172,7 @@ print('blah'.isalpha(), 'blah1'.isalpha())
 
 ## String tricks: the `string` module
 
-<Entry term="import string">
+<Entry term="import string" short="Ready-made sets of characters">
 <Fragment slot="code">
 
 ```python
@@ -188,7 +188,7 @@ Ready-made sets of characters.
 
 </Entry>
 
-<Entry term="Strip off punctuation">
+<Entry term="Strip off punctuation" short="strip() any characters you list">
 <Fragment slot="code">
 
 ```python

@@ -10,7 +10,7 @@ import { Steps, FileTree } from '@astrojs/starlight/components';
 
 <Legend />
 
-The colours are the same as in the original Google Docs:
+The colours are the same as in the original Google Docs. Inside a dictionary, the key sits at the bottom of the sidebar.
 
 - <Value>Value</Value>: something **you** choose, like a table name, a variable or a number.
 - `CODE`: the code you type exactly as written.
@@ -19,9 +19,11 @@ The colours are the same as in the original Google Docs:
 
 ## Entries
 
-Each term is an **entry**: code on the left, explanation on the right.
+Each term is an **entry**: one row with the term and a **short meaning** for quick lookup. Click the row to open the full explanation and the code.
 
-<Entry term="Example entry">
+Keep `short` under about 40 characters.
+
+<Entry term="Example entry" short="Short meaning for quick lookup" open>
 <Fragment slot="code">
 
 ```sql

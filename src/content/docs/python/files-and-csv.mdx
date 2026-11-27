@@ -24,7 +24,7 @@ import { Concept, Value, Entry, RunPython } from '@components';
 
 ## Text files (.txt)
 
-<Entry term="open() · read() · readlines()">
+<Entry term="open() · read() · readlines()" short="Open a file; read all or by line">
 <Fragment slot="code">
 
 ```python
@@ -44,7 +44,7 @@ for line in open('shopping.txt'):   # loop line by line
 
 </Entry>
 
-<Entry term="Writing: write() or print(file=)">
+<Entry term="Writing: write() or print(file=)" short="Write text into a file">
 <Fragment slot="code">
 
 ```python
@@ -60,7 +60,7 @@ The `'w'` sets it to <Concept>write mode</Concept>. Use `f.close()` to close the
 
 </Entry>
 
-<Entry term="with open(...) as …">
+<Entry term="with open(...) as …" short="Open a file; closes automatically">
 <Fragment slot="code">
 
 ```python
@@ -85,7 +85,7 @@ print(open('shopping.txt').readlines())`} />
 
 ## CSV: Comma Separated Values
 
-<Entry term="csv.reader">
+<Entry term="csv.reader" short="Read CSV rows as lists">
 <Fragment slot="code">
 
 ```python
@@ -101,7 +101,7 @@ Each row comes back as a **list**.
 
 </Entry>
 
-<Entry term="delimiter=">
+<Entry term="delimiter=" short="Use another separator than comma">
 <Fragment slot="code">
 
 ```python
@@ -117,7 +117,7 @@ Use another character instead of a comma.
 
 </Entry>
 
-<Entry term="csv.DictReader">
+<Entry term="csv.DictReader" short="Read CSV rows as dictionaries">
 <Fragment slot="code">
 
 ```python
@@ -140,7 +140,7 @@ with open('example.csv', newline='') as f:
         print(line)
         print(line['name'], 'is', line['age'], 'and lives in', line['city'])`} />
 
-<Entry term="csv.writer · csv.DictWriter">
+<Entry term="csv.writer · csv.DictWriter" short="Write rows as lists / dicts">
 <Fragment slot="code">
 
 ```python

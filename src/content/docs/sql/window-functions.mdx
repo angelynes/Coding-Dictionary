@@ -26,7 +26,7 @@ import { Concept, Value, Entry } from '@components';
 
 ## The window: OVER & PARTITION BY
 
-<Entry term="function(column) OVER (…)">
+<Entry term="function(column) OVER (…)" short="Calculate over rows, keep every row">
 <Fragment slot="code">
 
 ```sql
@@ -48,7 +48,7 @@ function(column) OVER (
 
 </Entry>
 
-<Entry term="SUM() OVER (PARTITION BY … ORDER BY …)">
+<Entry term="SUM() OVER (PARTITION BY … ORDER BY …)" short="Running total per group">
 <Fragment slot="code">
 
 ```sql run
@@ -69,7 +69,7 @@ A running total that **restarts for each category**, next to a grand total from 
 
 ## Running totals & moving averages
 
-<Entry term="ROWS BETWEEN … AND CURRENT ROW">
+<Entry term="ROWS BETWEEN … AND CURRENT ROW" short="Running totals / moving averages">
 <Fragment slot="code">
 
 ```sql run
@@ -94,7 +94,7 @@ FROM matches;
 
 ## Numbering & ranking
 
-<Entry term="ROW_NUMBER()">
+<Entry term="ROW_NUMBER()" short="Number rows 1, 2, 3 per group">
 <Fragment slot="code">
 
 ```sql run
@@ -111,7 +111,7 @@ Gives a **unique** sequential number to each row within its partition. Filter `r
 
 </Entry>
 
-<Entry term="RANK() · DENSE_RANK()">
+<Entry term="RANK() · DENSE_RANK()" short="Rank with ties (skip or no skip)">
 <Fragment slot="code">
 
 ```sql run
@@ -130,7 +130,7 @@ FROM sales;
 
 ## Looking back & forward
 
-<Entry term="LAG() · LEAD()">
+<Entry term="LAG() · LEAD()" short="Value from the row before / after">
 <Fragment slot="code">
 
 ```sql run

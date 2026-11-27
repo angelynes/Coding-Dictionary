@@ -35,7 +35,7 @@ import { Concept, Value, Entry } from '@components';
 
 A <Concept>join</Concept> combines tables **horizontally**, adding more columns side by side.
 
-<Entry term="LEFT JOIN">
+<Entry term="LEFT JOIN" short="All left rows + their matches">
 <Fragment slot="code">
 
 ```sql run
@@ -56,7 +56,7 @@ Returns **all** rows from the left table, plus the matching rows from the right 
 
 </Entry>
 
-<Entry term="INNER JOIN … USING">
+<Entry term="INNER JOIN … USING" short="Only rows that match in both">
 <Fragment slot="code">
 
 ```sql run
@@ -76,7 +76,7 @@ Returns only rows that **match in both** tables (Brazil and France disappear).
 
 </Entry>
 
-<Entry term="RIGHT JOIN · FULL JOIN">
+<Entry term="RIGHT JOIN · FULL JOIN" short="All right rows / all rows from both">
 <Fragment slot="code">
 
 ```sql run
@@ -93,7 +93,7 @@ FULL JOIN order_items AS o
 
 </Entry>
 
-<Entry term="CROSS JOIN">
+<Entry term="CROSS JOIN" short="Every row × every row">
 <Fragment slot="code">
 
 ```sql run
@@ -112,7 +112,7 @@ Returns the <Concept>Cartesian product</Concept>: **every** row of table 1 combi
 
 Set operations combine query results **vertically**, stacking rows on top of each other. Both queries need the same number of columns.
 
-<Entry term="UNION · UNION ALL">
+<Entry term="UNION · UNION ALL" short="Stack results; ALL keeps duplicates">
 <Fragment slot="code">
 
 ```sql run
@@ -130,7 +130,7 @@ Change it to `UNION ALL` and see priya appear twice.
 
 </Entry>
 
-<Entry term="INTERSECT">
+<Entry term="INTERSECT" short="Rows in both results">
 <Fragment slot="code">
 
 ```sql run
@@ -145,7 +145,7 @@ Returns only records found in **both** results. The columns must match, and dupl
 
 </Entry>
 
-<Entry term="EXCEPT">
+<Entry term="EXCEPT" short="Left rows not in the right">
 <Fragment slot="code">
 
 ```sql run
