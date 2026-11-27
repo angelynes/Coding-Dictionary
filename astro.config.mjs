@@ -8,11 +8,11 @@ import remarkRunnable from './src/plugins/remark-runnable.mjs';
 const volumes = JSON.parse(readFileSync('./src/volumes.json', 'utf8'));
 
 // Vercel sets VERCEL=1 while building. There the site lives at the root of
-// coding-dictionary-coral.vercel.app; on GitHub Pages it lives under /Coding-Dictionary.
+// the-coding-dictionary.vercel.app; on GitHub Pages it lives under /Coding-Dictionary.
 const onVercel = !!process.env.VERCEL;
 
 export default defineConfig({
-	site: onVercel ? 'https://coding-dictionary-coral.vercel.app' : 'https://angelynes.github.io',
+	site: onVercel ? 'https://the-coding-dictionary.vercel.app' : 'https://angelynes.github.io',
 	base: onVercel ? '/' : '/Coding-Dictionary',
 	// ```sql run / ```python run code blocks become runnable boxes
 	markdown: { remarkPlugins: [remarkRunnable] },
